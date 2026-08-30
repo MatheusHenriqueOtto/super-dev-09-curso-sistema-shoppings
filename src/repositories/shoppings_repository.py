@@ -1,5 +1,5 @@
 from src.database.conexao import conectar
-from src.schemas.shoppings import Shopping
+from src.schemas.shoppings import Shopping, ShoppingCadastro
 
 def consultar_todos() -> list[Shopping] | None:
     with conectar() as conexao:
@@ -27,4 +27,31 @@ def consultar_todos() -> list[Shopping] | None:
         shoppings.append(shopping)
 
     return shoppings
+
+
+def cadastrar(shopping: ShoppingCadastro) -> Shopping:
+    """Responsavel por cadstrar um shopping a tabela de shopings"""
+    sql = """INSERT INTO shoppings (nome, cnpj, cidade) VALUES (%s, %s, %s)"""
+    with conectar() as conexao:
+        with conexao.cursor() as cursor:
+            cursor.execute(sql, (
+                shopping.nome,
+                shopping.cnpj,
+                shopping.cidade
+            ))
+
+            conexao.commit()
+
+            if cursor.lastrowid is not None:
+                novo_id: int = int(cursor.lastrowid)
+            else:
+                raise ValueError("Falha ao obter o ID do shopping cadastrado.")
+
+    return Shopping(
+        id=novo_id,
+        nome=shopping.nome,
+        cnpj=shopping.cnpj,
+        cidade=shopping.cidade,
+        registro_ativo=True
+    )
 
