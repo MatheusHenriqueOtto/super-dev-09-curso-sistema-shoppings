@@ -7,7 +7,7 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-
+from src.controllers import shoppings_controllers
 
 app = FastAPI(
     title="Mallverse API",
@@ -27,6 +27,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(shoppings_controllers.router)
 
 if __name__ == "__main__":
     import uvicorn
