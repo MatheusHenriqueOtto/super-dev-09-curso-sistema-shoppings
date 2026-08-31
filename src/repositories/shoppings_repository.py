@@ -1,5 +1,5 @@
 from src.database.conexao import conectar
-from src.schemas.shoppings import Shopping, ShoppingCadastro
+from src.schemas.shoppings import Shopping, ShoppingCadastro, ShoppingEditar
 
 def consultar_todos() -> list[Shopping] | None:
     with conectar() as conexao:
@@ -55,3 +55,25 @@ def cadastrar(shopping: ShoppingCadastro) -> Shopping:
         registro_ativo=True
     )
 
+
+def editar(id: int, shopping: ShoppingEditar):
+    sql = """UPDATE shoppings SET
+        nome=%s,
+        cnpj=%s,
+        cidade=%s
+    WHERE id=%s
+    """
+
+    with conectar() as conexao:
+        with conexao.cursor() as cursor:
+            cursor.execute(sql, (
+                shopping.nome,
+                shopping.cnpj,
+                shopping.cidade,
+                id
+            ))
+            conexao.commit()
+
+
+def consultar_por_id(id: int):
+    pass

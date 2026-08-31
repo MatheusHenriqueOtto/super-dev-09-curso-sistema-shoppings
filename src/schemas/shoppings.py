@@ -16,4 +16,8 @@ class ShoppingCadastro:
     cidade: str
 
 
-
+@dataclass
+class ShoppingEditar:
+    nome: str
+    cnpj: str
+    cidade: str
