@@ -57,6 +57,10 @@ CREATE TABLE avaliacoes (
     id_cliente INT NOT NULL,
     FOREIGN KEY (id_cliente) REFERENCES clientes(id),
     registro_ativo BIT NOT NULL DEFAULT(1)
+
+    CONSTRAINT fk_avaliacao_cliente
+        FOREIGN KEY (id_cliente)
+        REFERENCES clientes(id)
 );
 
 CREATE TABLE contratos (
