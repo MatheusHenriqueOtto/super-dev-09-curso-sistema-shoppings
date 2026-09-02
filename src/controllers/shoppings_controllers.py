@@ -28,3 +28,28 @@ def editar_shopping(id: int, shopping: ShoppingEditar):
     return {
         "status": "ok"
     }
+
+
+@router.delete("/shoppings/{id}")
+def apagar_shopping(id: int):
+    shopping = shoppings_repository.consultar_por_id(id)
+
+    if shopping is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="shopping não encontrado")
+
+
+    shoppings_repository.apagar(id)
+    return {
+        "status": "ok, deleted"
+    }
+
+
+@router.get("/shoppings/{id}")
+def consultar_shpping_por_id(id: int):
+    shopping = shoppings_repository.consultar_por_id(id)
+
+    if shopping is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="shopping não encontrado")
+
+    return shopping
+

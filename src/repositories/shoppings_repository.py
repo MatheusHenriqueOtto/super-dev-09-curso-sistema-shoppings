@@ -1,3 +1,4 @@
+from typing import Any, Optional
 from src.database.conexao import conectar
 from src.schemas.shoppings import Shopping, ShoppingCadastro, ShoppingEditar
 
@@ -75,5 +76,38 @@ def editar(id: int, shopping: ShoppingEditar):
             conexao.commit()
 
 
-def consultar_por_id(id: int):
-    pass
+def consultar_por_id(id: int) -> Optional[Shopping]:
+    """Responsável por consultar shoppings filtrando por id"""
+    sql = """SELECT
+    shoppings.id,
+    shoppings.nome,
+    shoppings.cnpj,
+    shoppings.cidade,
+    shoppings.registro_ativo
+FROM shoppings
+WHERE shoppings.registro_ativo = 1 AND shoppings.id = %s"""
+    
+    with conectar() as conexao:
+        with conexao.cursor() as cursor:
+            cursor.execute(sql, (id,))
+            registro: Any = cursor.fetchone()
+
+    if registro is None:
+        return None
+
+    return Shopping(
+        id=registro[0],
+        nome=registro[1],
+        cnpj=registro[2],
+        cidade=registro[3],
+        registro_ativo=registro[4]
+    )
+
+
+
+def apagar(id: int):
+    sql = "UPDATE shoppings SET registro_ativo = 0 WHERE id = %s"
+    with conectar() as conexao:
+        with conexao.cursor() as cursor:
+            cursor.execute(sql, (id,))
+            conexao.commit()
