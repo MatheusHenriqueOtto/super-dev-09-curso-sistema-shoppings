@@ -1,160 +1,77 @@
+from typing import Any
 from src.database.conexao import conectar
-from src.schemas.avaliacoes import Avaliacao
+from src.schemas.avaliacoes import Avaliacao, AvaliacaoCadastro, AvaliacaoEditar
 
-
-# =========================
-# LISTAR TODOS
-# =========================
 
 def consultar_todos() -> list[Avaliacao]:
     with conectar() as conexao:
         with conexao.cursor() as cursor:
-            cursor.execute("""
-                SELECT id, nota, comentario, id_cliente, registro_ativo
-                FROM avaliacoes
-            """)
-
-            registros = cursor.fetchall()
-
-    avaliacoes = []
-
-    for registro in registros:
-        avaliacao = Avaliacao(
-            id=registro[0],
-            nota=registro[1],
-            comentario=registro[2],
-            id_cliente=registro[3],
-            registro_ativo=registro[4]
-        )
-
-        avaliacoes.append(avaliacao)
-
-    return avaliacoes
+            cursor.execute("""SELECT id, nota, comentario, id_cliente, CAST(registro_ativo AS UNSIGNED)
+                FROM avaliacoes WHERE registro_ativo = b'1'""")
+            registros: list = cursor.fetchall()
+    return [Avaliacao(registro[0], registro[1], registro[2], registro[3], bool(registro[4])) for registro in registros]
 
 
-# =========================
-# BUSCAR POR ID
-# =========================
-
-def consultar_por_id(id_avaliacao: int) -> Avaliacao | None:
+def consultar_por_id(id: int) -> Avaliacao | None:
     with conectar() as conexao:
         with conexao.cursor() as cursor:
             cursor.execute("""
-                SELECT id, nota, comentario, id_cliente, registro_ativo
-                FROM avaliacoes
-                WHERE id = %s
-            """, (id_avaliacao,))
-
-            registro = cursor.fetchone()
+                SELECT id, nota, comentario, id_cliente, CAST(registro_ativo AS UNSIGNED)
+                FROM avaliacoes 
+                WHERE id = %s AND registro_ativo = b'1'
+            """, (id,))
+            registro: Any = cursor.fetchone()
 
     if registro is None:
         return None
 
     return Avaliacao(
-        id=registro[0],
-        nota=registro[1],
-        comentario=registro[2],
-        id_cliente=registro[3],
-        registro_ativo=registro[4]
+        registro[0],
+        registro[1],
+        registro[2],
+        registro[3],
+        bool(registro[4])
     )
 
 
-# =========================
-# CADASTRAR
-# =========================
-
-def cadastrar(
-    nota: int,
-    comentario: str | None,
-    id_cliente: int
-) -> None:
-
+def cadastrar(item: AvaliacaoCadastro) -> Avaliacao:
     with conectar() as conexao:
         with conexao.cursor() as cursor:
-            cursor.execute("""
-                INSERT INTO avaliacoes
-                (nota, comentario, id_cliente, registro_ativo)
-                VALUES (%s, %s, %s, 1)
-            """, (nota, comentario, id_cliente))
-
+            cursor.execute("INSERT INTO avaliacoes (nota, comentario, id_cliente, registro_ativo) VALUES (%s, %s, %s, 1)", (item.nota, item.comentario, item.id_cliente))
+            if cursor.lastrowid is not None:
+                novo_id: int = int(cursor.lastrowid)
+            
+            else:
+                raise ValueError("Falha ao obter o ID da avaliacão cadastrada.")
+            
         conexao.commit()
+    return Avaliacao(novo_id, item.nota, item.comentario, item.id_cliente, True)
 
 
-# =========================
-# ATUALIZAR
-# =========================
-
-def atualizar(
-    id_avaliacao: int,
-    nota: int,
-    comentario: str | None,
-    id_cliente: int
-) -> bool:
-
+def atualizar(id: int, item: AvaliacaoEditar) -> bool:
     with conectar() as conexao:
         with conexao.cursor() as cursor:
-            cursor.execute("""
-                UPDATE avaliacoes
-                SET nota = %s,
-                    comentario = %s,
-                    id_cliente = %s
-                WHERE id = %s
-            """, (
-                nota,
-                comentario,
-                id_cliente,
-                id_avaliacao
-            ))
-
-            alterados = cursor.rowcount
-
+            cursor.execute("UPDATE avaliacoes SET nota = %s, comentario = %s, id_cliente = %s WHERE id = %s", (item.nota, item.comentario, item.id_cliente, id))
+            resultado = cursor.rowcount > 0
         conexao.commit()
+    return resultado
 
-    return alterados > 0
 
-
-# =========================
-# ALTERAR STATUS
-# =========================
-
-def alterar_status(
-    id_avaliacao: int,
-    registro_ativo: bool
-) -> bool:
-
+def alterar_status(id: int, registro_ativo: bool) -> bool:
     with conectar() as conexao:
         with conexao.cursor() as cursor:
-            cursor.execute("""
-                UPDATE avaliacoes
-                SET registro_ativo = %s
-                WHERE id = %s
-            """, (
-                registro_ativo,
-                id_avaliacao
-            ))
-
-            alterados = cursor.rowcount
-
+            cursor.execute("SELECT id FROM avaliacoes WHERE id = %s", (id,))
+            if cursor.fetchone() is None:
+                return False
+            cursor.execute("UPDATE avaliacoes SET registro_ativo = %s WHERE id = %s", (registro_ativo, id))
         conexao.commit()
+    return True
 
-    return alterados > 0
 
-
-# =========================
-# EXCLUIR
-# =========================
-
-def excluir(id_avaliacao: int) -> bool:
-
+def excluir(id: int) -> bool:
     with conectar() as conexao:
         with conexao.cursor() as cursor:
-            cursor.execute("""
-                DELETE FROM avaliacoes
-                WHERE id = %s
-            """, (id_avaliacao,))
-
-            excluidos = cursor.rowcount
-
+            cursor.execute("DELETE FROM avaliacoes WHERE id = %s", (id,))
+            resultado = cursor.rowcount > 0
         conexao.commit()
-
-    return excluidos > 0
+    return resultado

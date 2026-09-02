@@ -2,23 +2,26 @@ from dataclasses import dataclass
 
 
 @dataclass
-class Cliente:
+class Funcionario:
     id: int
+    id_loja: int
     nome: str
     cpf: str
-    telefone: str | None
+    cargo: str
     registro_ativo: bool
 
 
 @dataclass
-class ClienteCadastro:
+class FuncionarioCadastro:
+    id_loja: int
     nome: str
     cpf: str
-    telefone: str | None = None
+    cargo: str
 
 
 @dataclass
-class ClienteEditar:
+class FuncionarioEditar:
+    id_loja: int
     nome: str
     cpf: str
-    telefone: str | None = None
+    cargo: str

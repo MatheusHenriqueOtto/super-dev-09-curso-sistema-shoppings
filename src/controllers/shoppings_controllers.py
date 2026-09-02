@@ -1,9 +1,7 @@
-
+from fastapi import APIRouter, HTTPException
 
 from src.repositories import shoppings_repository
-from src.schemas.shoppings import Shopping, ShoppingCadastro, ShoppingEditar
-from fastapi import APIRouter, HTTPException, status
-
+from src.schemas.shoppings import ShoppingCadastro, ShoppingEditar
 
 router = APIRouter()
 
@@ -11,45 +9,33 @@ router = APIRouter()
 def listar_shoppings():
     return shoppings_repository.consultar_todos()
 
-
-@router.post("/shoppings")
-def cadastrar_shpping(shopping: ShoppingCadastro):
-    return shoppings_repository.cadastrar(shopping)
-
-
-@router.put("/shoppings/{id}")
-def editar_shopping(id: int, shopping: ShoppingEditar):
-    shopping_banco = shoppings_repository.consultar_por_id(id)
-
-    if shopping_banco is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Pokemon não encontrado")
-
-    shoppings_repository.editar(id, shopping)
-    return {
-        "status": "ok"
-    }
-
-
-@router.delete("/shoppings/{id}")
-def apagar_shopping(id: int):
-    shopping = shoppings_repository.consultar_por_id(id)
-
-    if shopping is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="shopping não encontrado")
-
-
-    shoppings_repository.apagar(id)
-    return {
-        "status": "ok, deleted"
-    }
-
-
 @router.get("/shoppings/{id}")
-def consultar_shpping_por_id(id: int):
+def buscar_shopping(id: int):
     shopping = shoppings_repository.consultar_por_id(id)
-
     if shopping is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="shopping não encontrado")
-
+        raise HTTPException(status_code=404, detail="Shopping não encontrado")
     return shopping
 
+@router.post("/shoppings")
+def cadastrar_shopping(shopping: ShoppingCadastro):
+    return shoppings_repository.cadastrar(shopping)
+
+@router.put("/shoppings/{id}")
+def atualizar_shopping(id: int, shopping: ShoppingEditar):
+    if shoppings_repository.consultar_por_id(id) is None:
+        raise HTTPException(status_code=404, detail="Shopping não encontrado")
+    shoppings_repository.atualizar(id, shopping)
+    return {"mensagem": "Shopping atualizado com sucesso"}
+
+@router.patch("/shoppings/{id}/status")
+def alterar_status_shopping(id: int, registro_ativo: bool):
+    if not shoppings_repository.alterar_status(id, registro_ativo):
+        raise HTTPException(status_code=404, detail="Shopping não encontrado")
+    return {"mensagem": "Status alterado com sucesso"}
+
+@router.delete("/shoppings/{id}")
+def excluir_shopping(id: int):
+    if shoppings_repository.consultar_por_id(id) is None:
+        raise HTTPException(status_code=404, detail="Shopping não encontrado")
+    shoppings_repository.excluir(id)
+    return {"mensagem": "Shopping excluído com sucesso"}

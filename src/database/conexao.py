@@ -3,8 +3,9 @@ from mysql.connector.abstracts import MySQLConnectionAbstract
 from mysql.connector.pooling import PooledMySQLConnection
 from src.settings.settings import configuracoes
 
+
 def conectar() -> PooledMySQLConnection | MySQLConnectionAbstract:
-    """Abre uma nova conexao com o banco de daodos. Quem chama é responsável por fechar (use `with`)."""
+    """Abre uma conexão; o chamador é responsável por fechá-la."""
     return connect(
         host=configuracoes.db_host,
         port=configuracoes.db_port,
@@ -12,3 +13,4 @@ def conectar() -> PooledMySQLConnection | MySQLConnectionAbstract:
         password=configuracoes.db_pass,
         database=configuracoes.db_name,
     )
+
