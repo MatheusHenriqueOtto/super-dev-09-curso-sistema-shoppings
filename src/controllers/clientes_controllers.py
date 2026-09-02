@@ -1,116 +1,41 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 
 from src.repositories import clientes_repository
-
+from src.schemas.clientes import ClienteCadastro, ClienteEditar
 
 router = APIRouter()
-
-
-# =========================
-# LISTAR TODOS
-# =========================
 
 @router.get("/clientes")
 def listar_clientes():
     return clientes_repository.consultar_todos()
 
-
-# =========================
-# BUSCAR POR ID
-# =========================
-
-@router.get("/clientes/{id_cliente}")
-def buscar_cliente(id_cliente: int):
-    return clientes_repository.consultar_por_id(id_cliente)
-
-
-# =========================
-# CADASTRAR
-# =========================
+@router.get("/clientes/{id}")
+def buscar_cliente(id: int):
+    cliente = clientes_repository.consultar_por_id(id)
+    if cliente is None:
+        raise HTTPException(status_code=404, detail="Cliente não encontrado")
+    return cliente
 
 @router.post("/clientes")
-def cadastrar_cliente(
-    nome: str,
-    cpf: str,
-    telefone: str | None = None
-):
-    clientes_repository.cadastrar(
-        nome,
-        cpf,
-        telefone
-    )
+def cadastrar_cliente(cliente: ClienteCadastro):
+    return clientes_repository.cadastrar(cliente)
 
-    return {
-        "mensagem": "Cliente cadastrado com sucesso!"
-    }
+@router.put("/clientes/{id}")
+def atualizar_cliente(id: int, cliente: ClienteEditar):
+    if clientes_repository.consultar_por_id(id) is None:
+        raise HTTPException(status_code=404, detail="Cliente não encontrado")
+    clientes_repository.atualizar(id, cliente)
+    return {"mensagem": "Cliente atualizado com sucesso"}
 
+@router.patch("/clientes/{id}/status")
+def alterar_status_cliente(id: int, registro_ativo: bool):
+    if not clientes_repository.alterar_status(id, registro_ativo):
+        raise HTTPException(status_code=404, detail="Cliente não encontrado")
+    return {"mensagem": "Status alterado com sucesso"}
 
-# =========================
-# ATUALIZAR
-# =========================
-
-@router.put("/clientes/{id_cliente}")
-def atualizar_cliente(
-    id_cliente: int,
-    nome: str,
-    cpf: str,
-    telefone: str | None = None
-):
-    sucesso = clientes_repository.atualizar(
-        id_cliente,
-        nome,
-        cpf,
-        telefone
-    )
-
-    if not sucesso:
-        return {
-            "mensagem": "Cliente não encontrado!"
-        }
-
-    return {
-        "mensagem": "Cliente atualizado com sucesso!"
-    }
-
-
-# =========================
-# ALTERAR STATUS
-# =========================
-
-@router.patch("/clientes/{id_cliente}/status")
-def alterar_status(
-    id_cliente: int,
-    registro_ativo: bool
-):
-    sucesso = clientes_repository.alterar_status(
-        id_cliente,
-        registro_ativo
-    )
-
-    if not sucesso:
-        return {
-            "mensagem": "Cliente não encontrado!"
-        }
-
-    return {
-        "mensagem": "Status alterado com sucesso!"
-    }
-
-
-# =========================
-# EXCLUIR
-# =========================
-
-@router.delete("/clientes/{id_cliente}")
-def excluir_cliente(id_cliente: int):
-
-    sucesso = clientes_repository.excluir(id_cliente)
-
-    if not sucesso:
-        return {
-            "mensagem": "Cliente não encontrado!"
-        }
-
-    return {
-        "mensagem": "Cliente excluído com sucesso!"
-    }
+@router.delete("/clientes/{id}")
+def excluir_cliente(id: int):
+    if clientes_repository.consultar_por_id(id) is None:
+        raise HTTPException(status_code=404, detail="Cliente não encontrado")
+    clientes_repository.excluir(id)
+    return {"mensagem": "Cliente excluído com sucesso"}

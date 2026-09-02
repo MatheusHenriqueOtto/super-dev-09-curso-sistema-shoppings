@@ -1,116 +1,41 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 
 from src.repositories import avaliacoes_repository
-
+from src.schemas.avaliacoes import AvaliacaoCadastro, AvaliacaoEditar
 
 router = APIRouter()
-
-
-# =========================
-# LISTAR TODOS
-# =========================
 
 @router.get("/avaliacoes")
 def listar_avaliacoes():
     return avaliacoes_repository.consultar_todos()
 
-
-# =========================
-# BUSCAR POR ID
-# =========================
-
-@router.get("/avaliacoes/{id_avaliacao}")
-def buscar_avaliacao(id_avaliacao: int):
-    return avaliacoes_repository.consultar_por_id(id_avaliacao)
-
-
-# =========================
-# CADASTRAR
-# =========================
+@router.get("/avaliacoes/{id}")
+def buscar_avaliacao(id: int):
+    avaliacao = avaliacoes_repository.consultar_por_id(id)
+    if avaliacao is None:
+        raise HTTPException(status_code=404, detail="Avaliação não encontrada")
+    return avaliacao
 
 @router.post("/avaliacoes")
-def cadastrar_avaliacao(
-    nota: int,
-    comentario: str | None = None,
-    id_cliente: int = 0
-):
-    avaliacoes_repository.cadastrar(
-        nota,
-        comentario,
-        id_cliente
-    )
+def cadastrar_avaliacao(item: AvaliacaoCadastro):
+    return avaliacoes_repository.cadastrar(item)
 
-    return {
-        "mensagem": "Avaliação cadastrada com sucesso!"
-    }
+@router.put("/avaliacoes/{id}")
+def atualizar_avaliacao(id: int, item: AvaliacaoEditar):
+    if avaliacoes_repository.consultar_por_id(id) is None:
+        raise HTTPException(status_code=404, detail="Avaliação não encontrada")
+    avaliacoes_repository.atualizar(id, item)
+    return {"mensagem": "Avaliação atualizada com sucesso"}
 
+@router.patch("/avaliacoes/{id}/status")
+def alterar_status_avaliacao(id: int, registro_ativo: bool):
+    if not avaliacoes_repository.alterar_status(id, registro_ativo):
+        raise HTTPException(status_code=404, detail="Avaliação não encontrada")
+    return {"mensagem": "Status alterado com sucesso"}
 
-# =========================
-# ATUALIZAR
-# =========================
-
-@router.put("/avaliacoes/{id_avaliacao}")
-def atualizar_avaliacao(
-    id_avaliacao: int,
-    nota: int,
-    comentario: str | None = None,
-    id_cliente: int = 0
-):
-    sucesso = avaliacoes_repository.atualizar(
-        id_avaliacao,
-        nota,
-        comentario,
-        id_cliente
-    )
-
-    if not sucesso:
-        return {
-            "mensagem": "Avaliação não encontrada!"
-        }
-
-    return {
-        "mensagem": "Avaliação atualizada com sucesso!"
-    }
-
-
-# =========================
-# ALTERAR STATUS
-# =========================
-
-@router.patch("/avaliacoes/{id_avaliacao}/status")
-def alterar_status(
-    id_avaliacao: int,
-    registro_ativo: bool
-):
-    sucesso = avaliacoes_repository.alterar_status(
-        id_avaliacao,
-        registro_ativo
-    )
-
-    if not sucesso:
-        return {
-            "mensagem": "Avaliação não encontrada!"
-        }
-
-    return {
-        "mensagem": "Status alterado com sucesso!"
-    }
-
-
-# =========================
-# EXCLUIR
-# =========================
-
-@router.delete("/avaliacoes/{id_avaliacao}")
-def excluir_avaliacao(id_avaliacao: int):
-
-    sucesso = avaliacoes_repository.excluir(id_avaliacao)
-
-    if not sucesso:
-        return {
-            "mensagem": "Avaliação não encontrada!"
-        }
-
-    return {
-        "mensagem": "Avaliação excluída com sucesso!"
-    }
+@router.delete("/avaliacoes/{id}")
+def excluir_avaliacao(id: int):
+    if avaliacoes_repository.consultar_por_id(id) is None:
+        raise HTTPException(status_code=404, detail="Avaliação não encontrada")
+    avaliacoes_repository.excluir(id)
+    return {"mensagem": "Avaliação excluída com sucesso"}
