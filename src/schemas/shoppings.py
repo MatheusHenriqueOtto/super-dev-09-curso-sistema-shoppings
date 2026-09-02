@@ -9,3 +9,15 @@ class Shopping:
     registro_ativo: bool
 
 
+@dataclass
+class ShoppingCadastro:
+    nome: str
+    cnpj: str
+    cidade: str
+
+
+@dataclass
+class ShoppingEditar:
+    nome: str
+    cnpj: str
+    cidade: str
