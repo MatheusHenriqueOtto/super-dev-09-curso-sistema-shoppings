@@ -1,0 +1,2448 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mallverse — Shopping Network Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Inter+Tight:wght@600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<style>
+/* ============================================================
+   MALLVERSE DESIGN SYSTEM
+   Base: deep navy/indigo. Accent: signal amber (primary action,
+   revenue/positive data) + cyan (secondary data series).
+   Type: Inter (UI) / Inter Tight (numerals & headlines).
+   ============================================================ */
+
+:root{
+  --bg:#0A0F1C;
+  --bg-elevated:#0E1526;
+  --panel:#121A2E;
+  --panel-2:#182238;
+  --panel-3:#1D2842;
+  --border:#232E4A;
+  --border-soft:#1A2338;
+  --text:#EAEDF7;
+  --text-secondary:#9AA5C4;
+  --text-muted:#67719A;
+  --accent:#F5A623;
+  --accent-ink:#2A1A00;
+  --accent-soft:rgba(245,166,35,0.14);
+  --accent-2:#2DD4E8;
+  --accent-2-soft:rgba(45,212,232,0.14);
+  --success:#3ECF8E;
+  --success-soft:rgba(62,207,142,0.14);
+  --warning:#F5C543;
+  --warning-soft:rgba(245,197,67,0.14);
+  --danger:#F16A6A;
+  --danger-soft:rgba(241,106,106,0.14);
+  --info:#6C9CF5;
+  --info-soft:rgba(108,156,245,0.14);
+  --shadow-sm:0 1px 2px rgba(0,0,0,0.24);
+  --shadow-md:0 8px 24px rgba(2,6,16,0.36);
+  --shadow-lg:0 16px 48px rgba(2,6,16,0.5);
+  --radius-sm:6px;
+  --radius-md:10px;
+  --radius-lg:14px;
+  --sidebar-w:248px;
+  --sidebar-w-collapsed:76px;
+  --header-h:64px;
+  --font-ui:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  --font-display:'Inter Tight','Inter',sans-serif;
+}
+
+html[data-theme="light"]{
+  --bg:#F3F4F9;
+  --bg-elevated:#FFFFFF;
+  --panel:#FFFFFF;
+  --panel-2:#F6F7FB;
+  --panel-3:#EDEFF6;
+  --border:#E2E5F0;
+  --border-soft:#EAEDF5;
+  --text:#141A2C;
+  --text-secondary:#525C79;
+  --text-muted:#8790AB;
+  --accent:#C97C0C;
+  --accent-ink:#FFF7EA;
+  --accent-soft:rgba(201,124,12,0.10);
+  --accent-2:#0B8FA6;
+  --accent-2-soft:rgba(11,143,166,0.10);
+  --success:#1C9A63;
+  --success-soft:rgba(28,154,99,0.10);
+  --warning:#B57F0A;
+  --warning-soft:rgba(181,127,10,0.10);
+  --danger:#D14444;
+  --danger-soft:rgba(209,68,68,0.10);
+  --info:#3568D4;
+  --info-soft:rgba(53,104,212,0.10);
+  --shadow-sm:0 1px 2px rgba(20,26,44,0.06);
+  --shadow-md:0 8px 24px rgba(20,26,44,0.08);
+  --shadow-lg:0 16px 40px rgba(20,26,44,0.12);
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:var(--font-ui);
+  background:var(--bg);
+  color:var(--text);
+  font-size:14px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+  transition:background .25s ease,color .25s ease;
+}
+h1,h2,h3,h4{font-family:var(--font-display);font-weight:700;letter-spacing:-0.01em;color:var(--text)}
+button{font-family:inherit;cursor:pointer}
+a{color:inherit;text-decoration:none}
+input,select,textarea{font-family:inherit;font-size:14px;color:var(--text)}
+ul{list-style:none}
+::selection{background:var(--accent-soft);color:var(--text)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+.num{font-family:var(--font-display);font-variant-numeric:tabular-nums}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:8px;border:2px solid var(--bg)}
+
+/* ---------- App shell ---------- */
+#app{display:flex;min-height:100vh}
+
+/* Sidebar */
+#sidebar{
+  width:var(--sidebar-w);
+  flex-shrink:0;
+  background:var(--bg-elevated);
+  border-right:1px solid var(--border-soft);
+  display:flex;flex-direction:column;
+  height:100vh;position:sticky;top:0;
+  transition:width .2s ease;
+  z-index:40;
+}
+#sidebar.collapsed{width:var(--sidebar-w-collapsed)}
+.brand{
+  display:flex;align-items:center;gap:10px;
+  padding:20px 18px;height:var(--header-h);
+  border-bottom:1px solid var(--border-soft);
+  flex-shrink:0;overflow:hidden;
+}
+.brand-mark{
+  width:32px;height:32px;flex-shrink:0;border-radius:9px;
+  background:linear-gradient(155deg,var(--accent) 0%,#D6870E 100%);
+  display:flex;align-items:center;justify-content:center;
+  color:#1A1200;font-family:var(--font-display);font-weight:800;font-size:16px;
+  box-shadow:0 2px 10px rgba(245,166,35,0.35);
+}
+.brand-text{overflow:hidden;white-space:nowrap}
+.brand-name{font-family:var(--font-display);font-weight:800;font-size:15.5px;letter-spacing:-0.01em;line-height:1.1}
+.brand-sub{font-size:10.5px;color:var(--text-muted);letter-spacing:.02em;margin-top:2px}
+#sidebar.collapsed .brand-text{display:none}
+
+.nav-scroll{flex:1;overflow-y:auto;padding:14px 12px}
+.nav-group{margin-bottom:18px}
+.nav-group-label{
+  font-size:10.5px;font-weight:600;color:var(--text-muted);
+  padding:0 10px;margin-bottom:6px;letter-spacing:.03em;
+  white-space:nowrap;overflow:hidden;height:14px;
+}
+#sidebar.collapsed .nav-group-label{opacity:0}
+.nav-item{
+  display:flex;align-items:center;gap:11px;
+  padding:9px 10px;border-radius:8px;color:var(--text-secondary);
+  font-size:13.5px;font-weight:500;cursor:pointer;
+  margin-bottom:2px;white-space:nowrap;overflow:hidden;
+  transition:background .12s ease,color .12s ease;position:relative;
+}
+.nav-item svg{flex-shrink:0;width:17px;height:17px}
+.nav-item:hover{background:var(--panel-2);color:var(--text)}
+.nav-item.active{background:var(--accent-soft);color:var(--accent)}
+.nav-item .badge-count{
+  margin-left:auto;font-size:10.5px;font-weight:700;color:var(--text-muted);
+  background:var(--panel-3);padding:1px 6px;border-radius:20px;
+}
+.nav-item.active .badge-count{color:var(--accent);background:rgba(245,166,35,0.16)}
+#sidebar.collapsed .nav-item span,#sidebar.collapsed .badge-count{display:none}
+#sidebar.collapsed .nav-item{justify-content:center}
+
+.sidebar-footer{
+  border-top:1px solid var(--border-soft);padding:12px;flex-shrink:0;
+}
+.user-row{
+  display:flex;align-items:center;gap:10px;padding:8px;border-radius:9px;cursor:pointer;
+}
+.user-row:hover{background:var(--panel-2)}
+.avatar{
+  width:32px;height:32px;border-radius:8px;flex-shrink:0;
+  background:linear-gradient(155deg,var(--accent-2),#1591A3);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:12.5px;color:#03252A;font-family:var(--font-display);
+}
+.user-meta{overflow:hidden;white-space:nowrap;flex:1}
+.user-name{font-size:13px;font-weight:600}
+.user-role{font-size:11px;color:var(--text-muted)}
+#sidebar.collapsed .user-meta{display:none}
+.collapse-toggle{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;padding:7px;margin-top:8px;border-radius:8px;border:1px solid var(--border-soft);
+  background:transparent;color:var(--text-muted);font-size:11.5px;
+}
+.collapse-toggle:hover{color:var(--text);border-color:var(--border)}
+.collapse-toggle svg{width:14px;height:14px}
+
+/* Main column */
+#main-col{flex:1;min-width:0;display:flex;flex-direction:column}
+#topbar{
+  height:var(--header-h);flex-shrink:0;
+  display:flex;align-items:center;gap:14px;
+  padding:0 24px;border-bottom:1px solid var(--border-soft);
+  background:var(--bg-elevated);position:sticky;top:0;z-index:30;
+}
+.mobile-menu-btn{display:none;background:none;border:none;color:var(--text);padding:6px}
+.topbar-search{
+  flex:1;max-width:380px;display:flex;align-items:center;gap:8px;
+  background:var(--panel-2);border:1px solid var(--border-soft);border-radius:8px;
+  padding:8px 12px;color:var(--text-muted);transition:border-color .15s;
+}
+.topbar-search:focus-within{border-color:var(--accent)}
+.topbar-search input{background:none;border:none;outline:none;color:var(--text);flex:1;font-size:13px}
+.topbar-search svg{width:15px;height:15px;flex-shrink:0}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.icon-btn{
+  width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;
+  background:transparent;border:1px solid transparent;color:var(--text-secondary);position:relative;
+  transition:background .12s,border-color .12s;
+}
+.icon-btn:hover{background:var(--panel-2);border-color:var(--border-soft);color:var(--text)}
+.icon-btn svg{width:17px;height:17px}
+.notif-dot{
+  position:absolute;top:7px;right:7px;width:7px;height:7px;border-radius:50%;
+  background:var(--danger);border:1.5px solid var(--bg-elevated);
+}
+.mall-select{
+  display:flex;align-items:center;gap:7px;background:var(--panel-2);border:1px solid var(--border-soft);
+  border-radius:8px;padding:8px 10px;font-size:12.5px;font-weight:600;color:var(--text);cursor:pointer;
+}
+.mall-select svg{width:14px;height:14px;color:var(--text-muted)}
+
+#view-root{flex:1;padding:26px 28px 60px;max-width:1520px;width:100%}
+
+/* ---------- Typography helpers ---------- */
+.page-header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:22px;flex-wrap:wrap}
+.page-title{font-size:22px;font-weight:800;letter-spacing:-0.015em}
+.page-subtitle{font-size:13px;color:var(--text-secondary);margin-top:4px}
+.section-title{font-size:15px;font-weight:700;margin-bottom:2px}
+.section-desc{font-size:12.5px;color:var(--text-muted)}
+
+/* ---------- Buttons ---------- */
+.btn{
+  display:inline-flex;align-items:center;gap:7px;padding:9px 15px;border-radius:8px;
+  font-size:13px;font-weight:600;border:1px solid transparent;white-space:nowrap;
+  transition:filter .12s,background .12s,border-color .12s;
+}
+.btn svg{width:15px;height:15px}
+.btn-primary{background:var(--accent);color:var(--accent-ink)}
+.btn-primary:hover{filter:brightness(1.07)}
+.btn-secondary{background:var(--panel-2);color:var(--text);border-color:var(--border-soft)}
+.btn-secondary:hover{border-color:var(--border);background:var(--panel-3)}
+.btn-ghost{background:transparent;color:var(--text-secondary)}
+.btn-ghost:hover{color:var(--text);background:var(--panel-2)}
+.btn-danger{background:var(--danger-soft);color:var(--danger)}
+.btn-danger:hover{filter:brightness(1.1)}
+.btn-sm{padding:6px 11px;font-size:12px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+
+/* ---------- Cards / Panels ---------- */
+.card{
+  background:var(--panel);border:1px solid var(--border-soft);border-radius:var(--radius-lg);
+  box-shadow:var(--shadow-sm);
+}
+.card-pad{padding:20px}
+
+/* KPI cards */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:20px}
+.kpi-card{
+  background:var(--panel);border:1px solid var(--border-soft);border-radius:var(--radius-lg);
+  padding:18px 18px 16px;position:relative;overflow:hidden;
+}
+.kpi-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.kpi-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center}
+.kpi-icon svg{width:17px;height:17px}
+.kpi-label{font-size:12px;color:var(--text-muted);font-weight:600}
+.kpi-value{font-size:25px;font-weight:800;font-family:var(--font-display);letter-spacing:-0.02em;margin-bottom:6px}
+.kpi-trend{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600}
+.kpi-trend svg{width:13px;height:13px}
+.trend-up{color:var(--success)}
+.trend-down{color:var(--danger)}
+.kpi-trend-label{color:var(--text-muted);font-weight:500}
+
+/* Grids for dashboard */
+.dash-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:16px;margin-bottom:16px}
+.dash-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px}
+@media(max-width:1180px){.dash-grid,.dash-grid-3{grid-template-columns:1fr}}
+
+.card-head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px 0}
+.chip-row{display:flex;gap:6px}
+.chip{
+  font-size:11.5px;font-weight:600;padding:5px 10px;border-radius:20px;color:var(--text-muted);
+  background:var(--panel-2);border:1px solid transparent;cursor:pointer;
+}
+.chip.active{background:var(--accent-soft);color:var(--accent);border-color:transparent}
+.chart-wrap{padding:8px 14px 18px}
+
+/* Activity list */
+.activity-list{padding:6px 8px 12px}
+.activity-item{display:flex;gap:11px;padding:10px 10px;border-radius:9px}
+.activity-item:hover{background:var(--panel-2)}
+.activity-icon{
+  width:32px;height:32px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+}
+.activity-icon svg{width:15px;height:15px}
+.activity-body{flex:1;min-width:0}
+.activity-text{font-size:12.8px;color:var(--text);line-height:1.4}
+.activity-text b{font-weight:600}
+.activity-time{font-size:11px;color:var(--text-muted);margin-top:2px}
+
+/* Status badges */
+.badge{
+  display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;
+  padding:3px 9px;border-radius:20px;white-space:nowrap;
+}
+.badge::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor}
+.badge-success{background:var(--success-soft);color:var(--success)}
+.badge-warning{background:var(--warning-soft);color:var(--warning)}
+.badge-danger{background:var(--danger-soft);color:var(--danger)}
+.badge-info{background:var(--info-soft);color:var(--info)}
+.badge-muted{background:var(--panel-3);color:var(--text-muted)}
+
+/* Tables */
+.table-card{background:var(--panel);border:1px solid var(--border-soft);border-radius:var(--radius-lg);overflow:hidden}
+.table-toolbar{display:flex;align-items:center;gap:10px;padding:16px 18px;border-bottom:1px solid var(--border-soft);flex-wrap:wrap}
+.search-box{
+  display:flex;align-items:center;gap:7px;background:var(--panel-2);border:1px solid var(--border-soft);
+  border-radius:8px;padding:8px 11px;min-width:220px;flex:1;max-width:320px;
+}
+.search-box input{background:none;border:none;outline:none;color:var(--text);flex:1;font-size:12.8px}
+.search-box svg{width:14px;height:14px;color:var(--text-muted);flex-shrink:0}
+.select-filter{
+  background:var(--panel-2);border:1px solid var(--border-soft);border-radius:8px;padding:8px 10px;
+  font-size:12.5px;color:var(--text);font-weight:500;
+}
+.table-scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:640px}
+thead th{
+  text-align:left;font-size:11px;font-weight:700;color:var(--text-muted);text-transform:none;
+  padding:11px 18px;border-bottom:1px solid var(--border-soft);white-space:nowrap;letter-spacing:.02em;
+  cursor:pointer;user-select:none;
+}
+thead th:hover{color:var(--text)}
+tbody td{padding:13px 18px;border-bottom:1px solid var(--border-soft);font-size:13px;vertical-align:middle}
+tbody tr{transition:background .1s}
+tbody tr:last-child td{border-bottom:none}
+tbody tr.clickable{cursor:pointer}
+tbody tr.clickable:hover{background:var(--panel-2)}
+.cell-primary{font-weight:600;color:var(--text)}
+.cell-muted{color:var(--text-muted)}
+.cell-with-avatar{display:flex;align-items:center;gap:10px}
+.mini-avatar{
+  width:30px;height:30px;border-radius:7px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;font-family:var(--font-display);
+  background:var(--panel-3);color:var(--text-secondary);
+}
+.row-actions{display:flex;gap:4px;opacity:1}
+.table-empty{padding:60px 20px;text-align:center;color:var(--text-muted)}
+.table-empty svg{width:34px;height:34px;margin-bottom:10px;opacity:.5}
+.table-footer{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;font-size:12px;color:var(--text-muted);border-top:1px solid var(--border-soft)}
+
+/* Card grid (malls page) */
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.mall-card{
+  background:var(--panel);border:1px solid var(--border-soft);border-radius:var(--radius-lg);
+  padding:18px;cursor:pointer;transition:border-color .15s,transform .15s;
+}
+.mall-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.mall-card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
+.mall-card-name{font-size:15.5px;font-weight:700;margin-bottom:3px}
+.mall-card-loc{font-size:12px;color:var(--text-muted);display:flex;align-items:center;gap:4px}
+.mall-card-loc svg{width:12px;height:12px}
+.mall-stat-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
+.mall-stat{background:var(--panel-2);border-radius:9px;padding:9px 11px}
+.mall-stat-val{font-size:15px;font-weight:700;font-family:var(--font-display)}
+.mall-stat-lbl{font-size:10.5px;color:var(--text-muted);margin-top:1px}
+.mall-card-foot{display:flex;align-items:center;justify-content:space-between;padding-top:12px;border-top:1px solid var(--border-soft);font-size:11.5px;color:var(--text-muted)}
+
+/* Progress bar */
+.progress-track{height:6px;border-radius:6px;background:var(--panel-3);overflow:hidden}
+.progress-fill{height:100%;border-radius:6px;background:var(--accent)}
+
+/* Tabs */
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--border-soft);margin-bottom:18px}
+.tab-btn{padding:11px 4px;margin-right:22px;font-size:13px;font-weight:600;color:var(--text-muted);border-bottom:2px solid transparent;position:relative;top:1px}
+.tab-btn.active{color:var(--text);border-color:var(--accent)}
+
+/* Detail header */
+.detail-back{display:flex;align-items:center;gap:6px;color:var(--text-muted);font-size:12.5px;font-weight:600;margin-bottom:14px}
+.detail-back:hover{color:var(--text)}
+.detail-back svg{width:14px;height:14px}
+.detail-hero{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:20px}
+.detail-hero-left{display:flex;align-items:center;gap:14px}
+.detail-avatar{
+  width:52px;height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(155deg,var(--panel-3),var(--panel-2));font-size:18px;font-weight:800;
+  font-family:var(--font-display);color:var(--accent);border:1px solid var(--border-soft);
+}
+.detail-title{font-size:19px;font-weight:800}
+.detail-meta{display:flex;gap:12px;color:var(--text-muted);font-size:12.5px;margin-top:4px;flex-wrap:wrap}
+.detail-meta span{display:flex;align-items:center;gap:4px}
+.detail-meta svg{width:12px;height:12px}
+
+/* Rating stars */
+.stars{display:inline-flex;gap:2px;color:var(--accent)}
+.stars svg{width:13px;height:13px}
+.rating-bar-row{display:flex;align-items:center;gap:10px;font-size:12px;margin-bottom:8px}
+.rating-bar-row .lbl{width:42px;color:var(--text-muted);flex-shrink:0}
+.rating-bar-row .progress-track{flex:1}
+.rating-bar-row .pct{width:34px;text-align:right;color:var(--text-muted);flex-shrink:0}
+
+/* Review card */
+.review-card{border:1px solid var(--border-soft);border-radius:var(--radius-md);padding:16px;margin-bottom:12px;background:var(--panel)}
+.review-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:10px}
+.review-comment{font-size:13px;color:var(--text-secondary);line-height:1.55;margin:8px 0}
+.review-foot{display:flex;justify-content:space-between;align-items:center;font-size:11.5px;color:var(--text-muted)}
+
+/* Modal */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(4,7,16,0.55);backdrop-filter:blur(2px);
+  display:flex;align-items:center;justify-content:center;z-index:100;padding:20px;
+  opacity:0;pointer-events:none;transition:opacity .16s ease;
+}
+.modal-overlay.open{opacity:1;pointer-events:auto}
+.modal-box{
+  background:var(--bg-elevated);border:1px solid var(--border-soft);border-radius:var(--radius-lg);
+  width:100%;max-width:480px;box-shadow:var(--shadow-lg);max-height:88vh;display:flex;flex-direction:column;
+  transform:translateY(8px) scale(.98);transition:transform .16s ease;
+}
+.modal-overlay.open .modal-box{transform:translateY(0) scale(1)}
+.modal-box.modal-lg{max-width:680px}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--border-soft);flex-shrink:0}
+.modal-title{font-size:15.5px;font-weight:700}
+.modal-body{padding:20px;overflow-y:auto}
+.modal-foot{display:flex;justify-content:flex-end;gap:8px;padding:16px 20px;border-top:1px solid var(--border-soft);flex-shrink:0}
+.modal-close{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);background:transparent;border:none}
+.modal-close:hover{background:var(--panel-2);color:var(--text)}
+
+.form-group{margin-bottom:14px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-label{display:block;font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:6px}
+.form-input,.form-select,.form-textarea{
+  width:100%;padding:9px 11px;border-radius:8px;border:1px solid var(--border);
+  background:var(--panel-2);color:var(--text);font-size:13px;outline:none;transition:border-color .12s;
+}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--accent)}
+.form-textarea{resize:vertical;min-height:70px}
+.form-hint{font-size:11px;color:var(--text-muted);margin-top:5px}
+
+/* Toast */
+#toast-stack{position:fixed;bottom:22px;right:22px;z-index:200;display:flex;flex-direction:column;gap:8px;max-width:320px}
+.toast{
+  display:flex;align-items:center;gap:10px;background:var(--bg-elevated);border:1px solid var(--border-soft);
+  border-left:3px solid var(--success);border-radius:9px;padding:12px 14px;box-shadow:var(--shadow-lg);
+  font-size:12.8px;font-weight:500;animation:toast-in .2s ease;
+}
+.toast svg{width:16px;height:16px;flex-shrink:0;color:var(--success)}
+.toast.danger{border-left-color:var(--danger)}
+.toast.danger svg{color:var(--danger)}
+.toast.info{border-left-color:var(--info)}
+.toast.info svg{color:var(--info)}
+@keyframes toast-in{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:translateX(0)}}
+
+/* Empty state */
+.empty-state{text-align:center;padding:70px 20px;color:var(--text-muted)}
+.empty-state svg{width:38px;height:38px;margin-bottom:12px;opacity:.5}
+.empty-state h3{font-size:14.5px;color:var(--text);margin-bottom:5px}
+.empty-state p{font-size:12.8px}
+
+/* Skeleton */
+.skel{background:linear-gradient(90deg,var(--panel-2) 25%,var(--panel-3) 37%,var(--panel-2) 63%);background-size:400% 100%;animation:skel 1.4s ease infinite;border-radius:8px}
+@keyframes skel{0%{background-position:100% 50%}100%{background-position:0 50%}}
+
+/* Notif panel */
+.notif-panel{
+  position:absolute;top:56px;right:24px;width:340px;background:var(--bg-elevated);
+  border:1px solid var(--border-soft);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);
+  z-index:60;max-height:420px;display:flex;flex-direction:column;opacity:0;transform:translateY(-6px);
+  pointer-events:none;transition:opacity .14s,transform .14s;
+}
+.notif-panel.open{opacity:1;transform:translateY(0);pointer-events:auto}
+.notif-panel-head{padding:14px 16px;border-bottom:1px solid var(--border-soft);font-weight:700;font-size:13.5px;display:flex;justify-content:space-between;align-items:center}
+.notif-panel-body{overflow-y:auto;padding:6px}
+.notif-item{display:flex;gap:10px;padding:10px;border-radius:8px}
+.notif-item:hover{background:var(--panel-2)}
+.notif-item .activity-icon{width:28px;height:28px}
+
+/* Analytics small tables */
+.perf-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border-soft)}
+.perf-row:last-child{border-bottom:none}
+.perf-rank{width:22px;font-size:12px;font-weight:700;color:var(--text-muted)}
+.perf-name{flex:1;font-size:12.8px;font-weight:600}
+.perf-sub{font-size:11px;color:var(--text-muted)}
+.perf-val{font-size:13px;font-weight:700;font-family:var(--font-display)}
+
+/* Settings */
+.settings-grid{display:grid;grid-template-columns:220px 1fr;gap:24px}
+.settings-nav .nav-item{color:var(--text-secondary)}
+.settings-section{margin-bottom:26px;padding-bottom:26px;border-bottom:1px solid var(--border-soft)}
+.settings-section:last-child{border-bottom:none}
+.toggle{width:40px;height:22px;border-radius:20px;background:var(--panel-3);position:relative;cursor:pointer;flex-shrink:0;border:1px solid var(--border-soft)}
+.toggle::after{content:'';position:absolute;width:16px;height:16px;border-radius:50%;background:var(--text-muted);top:2px;left:2px;transition:.16s}
+.toggle.on{background:var(--accent-soft);border-color:var(--accent)}
+.toggle.on::after{background:var(--accent);left:20px}
+.settings-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0}
+.settings-row-label{font-size:13px;font-weight:600}
+.settings-row-desc{font-size:11.5px;color:var(--text-muted);margin-top:2px}
+.theme-swatches{display:flex;gap:10px}
+.theme-swatch{width:74px;padding:10px;border-radius:10px;border:2px solid var(--border-soft);cursor:pointer;text-align:center;font-size:11px;font-weight:600;color:var(--text-muted)}
+.theme-swatch.active{border-color:var(--accent);color:var(--accent)}
+.theme-swatch-preview{height:36px;border-radius:6px;margin-bottom:6px}
+
+/* Responsive */
+.mobile-overlay{display:none}
+@media(max-width:900px){
+  #sidebar{position:fixed;left:0;top:0;transform:translateX(-100%);transition:transform .2s ease;box-shadow:var(--shadow-lg)}
+  #sidebar.mobile-open{transform:translateX(0)}
+  #sidebar.collapsed{width:var(--sidebar-w)}
+  #sidebar.collapsed .brand-text,#sidebar.collapsed .nav-item span,#sidebar.collapsed .user-meta,#sidebar.collapsed .badge-count{display:block}
+  #sidebar.collapsed .nav-item{justify-content:flex-start}
+  .collapse-toggle{display:none}
+  .mobile-menu-btn{display:flex}
+  .mobile-overlay{display:none;position:fixed;inset:0;background:rgba(4,7,16,.5);z-index:39}
+  .mobile-overlay.open{display:block}
+  #view-root{padding:18px 14px 50px}
+  .topbar{padding:0 14px}
+  .topbar-search{display:none}
+  .dash-grid,.dash-grid-3{grid-template-columns:1fr}
+  .settings-grid{grid-template-columns:1fr}
+  .form-row{grid-template-columns:1fr}
+  .kpi-grid{grid-template-columns:repeat(2,1fr)}
+  .notif-panel{right:14px;width:calc(100vw - 28px)}
+}
+@media(max-width:520px){
+  .kpi-grid{grid-template-columns:1fr}
+  .page-header{flex-direction:column;align-items:stretch}
+  .mall-select{display:none}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="mobile-overlay" id="mobileOverlay"></div>
+  <aside id="sidebar"></aside>
+  <div id="main-col">
+    <header id="topbar"></header>
+    <main id="view-root"></main>
+  </div>
+</div>
+<div id="modal-root"></div>
+<div id="toast-stack"></div>
+<script>
+/* ============================================================
+   MOCK DATA — realistic Brazilian shopping-mall network
+   ============================================================ */
+const CATS = ['Fashion','Food & Beverage','Electronics','Services','Entertainment','Other'];
+const CAT_LABEL_PT = {'Fashion':'Moda','Food & Beverage':'Alimentação','Electronics':'Eletrônicos','Services':'Serviços','Entertainment':'Entretenimento','Other':'Outros'};
+
+const DB = {
+  malls: [
+    { id:'m1', name:'Mall Central', city:'São Paulo', state:'SP', cnpj:'12.345.678/0001-90',
+      stores:86, occupancy:94.2, parkingTotal:2400, parkingOccupied:1784, revenue:1120000,
+      status:'Active', updated:'2026-08-30', satisfaction:4.8 },
+    { id:'m2', name:'Shopping Norte', city:'Curitiba', state:'PR', cnpj:'23.456.789/0001-11',
+      stores:64, occupancy:88.7, parkingTotal:1600, parkingOccupied:1102, revenue:640000,
+      status:'Active', updated:'2026-08-29', satisfaction:4.6 },
+    { id:'m3', name:'Plaza Sul', city:'Florianópolis', state:'SC', cnpj:'34.567.890/0001-22',
+      stores:58, occupancy:91.0, parkingTotal:1200, parkingOccupied:812, revenue:480000,
+      status:'Maintenance', updated:'2026-08-27', satisfaction:4.5 },
+    { id:'m4', name:'Mall Riverside', city:'Blumenau', state:'SC', cnpj:'45.678.901/0001-33',
+      stores:52, occupancy:96.1, parkingTotal:1000, parkingOccupied:743, revenue:240000,
+      status:'Active', updated:'2026-08-31', satisfaction:4.9 },
+  ],
+
+  stores: [
+    { id:'s1', name:'Aurora Fashion', mallId:'m1', unit:'L-102', category:'Fashion', manager:'Beatriz Almeida', status:'Active', revenue:98000, contractId:'c1' },
+    { id:'s2', name:'TechZone', mallId:'m1', unit:'L-210', category:'Electronics', manager:'Rafael Torres', status:'Active', revenue:154000, contractId:'c2' },
+    { id:'s3', name:'Café Central', mallId:'m1', unit:'Q-015', category:'Food & Beverage', manager:'Larissa Nunes', status:'Active', revenue:61000, contractId:'c3' },
+    { id:'s4', name:'Urban Shoes', mallId:'m1', unit:'L-118', category:'Fashion', manager:'Diego Farias', status:'Active', revenue:47000, contractId:'c4' },
+    { id:'s5', name:'Casa & Design', mallId:'m2', unit:'L-045', category:'Other', manager:'Camila Rocha', status:'Active', revenue:52000, contractId:'c5' },
+    { id:'s6', name:'Burger House', mallId:'m2', unit:'Q-008', category:'Food & Beverage', manager:'Thiago Souza', status:'Active', revenue:73000, contractId:'c6' },
+    { id:'s7', name:'Smart Electronics', mallId:'m2', unit:'L-133', category:'Electronics', manager:'Patrícia Lima', status:'Maintenance', revenue:39000, contractId:'c7' },
+    { id:'s8', name:'Livraria Página Cultural', mallId:'m3', unit:'L-072', category:'Entertainment', manager:'Eduardo Castro', status:'Active', revenue:28000, contractId:'c8' },
+    { id:'s9', name:'Academia PowerFit', mallId:'m3', unit:'A-201', category:'Services', manager:'Juliana Prado', status:'Active', revenue:44000, contractId:'c9' },
+    { id:'s10', name:'Cinema Star', mallId:'m3', unit:'C-001', category:'Entertainment', manager:'Marcos Vinícius', status:'Active', revenue:118000, contractId:'c10' },
+    { id:'s11', name:'Farmácia Vida', mallId:'m4', unit:'L-011', category:'Services', manager:'Renata Vieira', status:'Active', revenue:36000, contractId:'c11' },
+    { id:'s12', name:'Doce Encanto Chocolates', mallId:'m4', unit:'Q-022', category:'Food & Beverage', manager:'Fernanda Dias', status:'Active', revenue:24000, contractId:'c12' },
+    { id:'s13', name:'Vitrine Jeans', mallId:'m4', unit:'L-055', category:'Fashion', manager:'Gustavo Melo', status:'Inactive', revenue:0, contractId:'c13' },
+    { id:'s14', name:'Mundo Kids Brinquedos', mallId:'m1', unit:'L-301', category:'Other', manager:'Sofia Batista', status:'Active', revenue:31000, contractId:'c14' },
+    { id:'s15', name:'Studio Beauty & Spa', mallId:'m2', unit:'A-110', category:'Services', manager:'Amanda Cardoso', status:'Active', revenue:41000, contractId:'c15' },
+  ],
+
+  customers: [
+    { id:'cu1', name:'João Pedro Oliveira', cpf:'123.456.789-01', phone:'(11) 98765-4321', mallId:'m1', reviews:4, satisfaction:4.7, lastInteraction:'2026-08-29', status:'Active' },
+    { id:'cu2', name:'Maria Eduarda Santos', cpf:'234.567.890-12', phone:'(41) 99123-4567', mallId:'m2', reviews:2, satisfaction:4.5, lastInteraction:'2026-08-25', status:'Active' },
+    { id:'cu3', name:'Carlos Henrique Costa', cpf:'345.678.901-23', phone:'(48) 98877-2211', mallId:'m3', reviews:6, satisfaction:4.9, lastInteraction:'2026-08-30', status:'Active' },
+    { id:'cu4', name:'Ana Luiza Ferreira', cpf:'456.789.012-34', phone:'(47) 99654-1122', mallId:'m4', reviews:1, satisfaction:5.0, lastInteraction:'2026-08-31', status:'Active' },
+    { id:'cu5', name:'Pedro Henrique Rocha', cpf:'567.890.123-45', phone:'(11) 98123-9988', mallId:'m1', reviews:3, satisfaction:3.8, lastInteraction:'2026-08-20', status:'Active' },
+    { id:'cu6', name:'Isabela Martins', cpf:'678.901.234-56', phone:'(41) 99887-6655', mallId:'m2', reviews:5, satisfaction:4.2, lastInteraction:'2026-08-28', status:'Inactive' },
+    { id:'cu7', name:'Lucas Gabriel Almeida', cpf:'789.012.345-67', phone:'(48) 98456-7890', mallId:'m3', reviews:2, satisfaction:4.6, lastInteraction:'2026-08-22', status:'Active' },
+    { id:'cu8', name:'Giovanna Ribeiro', cpf:'890.123.456-78', phone:'(47) 99321-0099', mallId:'m4', reviews:3, satisfaction:4.4, lastInteraction:'2026-08-27', status:'Active' },
+  ],
+
+  employees: [
+    { id:'e1', name:'Beatriz Almeida', storeId:'s1', mallId:'m1', position:'Gerente de Loja', status:'Active', startDate:'2023-03-14', phone:'(11) 98111-2233' },
+    { id:'e2', name:'Rafael Torres', storeId:'s2', mallId:'m1', position:'Gerente de Loja', status:'Active', startDate:'2022-07-01', phone:'(11) 98222-3344' },
+    { id:'e3', name:'Bruno Cardoso', storeId:'s2', mallId:'m1', position:'Vendedor', status:'Active', startDate:'2024-01-20', phone:'(11) 98333-4455' },
+    { id:'e4', name:'Larissa Nunes', storeId:'s3', mallId:'m1', position:'Gerente de Loja', status:'Active', startDate:'2021-11-09', phone:'(11) 98444-5566' },
+    { id:'e5', name:'Vinícius Pereira', storeId:'s3', mallId:'m1', position:'Caixa', status:'Active', startDate:'2024-06-02', phone:'(11) 98555-6677' },
+    { id:'e6', name:'Camila Rocha', storeId:'s5', mallId:'m2', position:'Gerente de Loja', status:'Active', startDate:'2022-02-18', phone:'(41) 98666-7788' },
+    { id:'e7', name:'Thiago Souza', storeId:'s6', mallId:'m2', position:'Gerente de Loja', status:'Active', startDate:'2023-09-10', phone:'(41) 98777-8899' },
+    { id:'e8', name:'Patrícia Lima', storeId:'s7', mallId:'m2', position:'Gerente de Loja', status:'Inactive', startDate:'2020-05-25', phone:'(41) 98888-9900' },
+    { id:'e9', name:'Eduardo Castro', storeId:'s8', mallId:'m3', position:'Gerente de Loja', status:'Active', startDate:'2023-01-30', phone:'(48) 98999-0011' },
+    { id:'e10', name:'Juliana Prado', storeId:'s9', mallId:'m3', position:'Gerente de Loja', status:'Active', startDate:'2022-10-12', phone:'(48) 98100-2233' },
+    { id:'e11', name:'Renata Vieira', storeId:'s11', mallId:'m4', position:'Gerente de Loja', status:'Active', startDate:'2024-03-05', phone:'(47) 98200-3344' },
+    { id:'e12', name:'Gustavo Melo', storeId:'s13', mallId:'m4', position:'Estoquista', status:'Inactive', startDate:'2021-08-19', phone:'(47) 98300-4455' },
+  ],
+
+  parkingSectors: {
+    m1:[{name:'Setor A',spaces:540,occupied:82},{name:'Setor B',spaces:420,occupied:67},{name:'Setor C',spaces:680,occupied:75},{name:'Setor D',spaces:760,occupied:71}],
+    m2:[{name:'Setor A',spaces:400,occupied:70},{name:'Setor B',spaces:380,occupied:58},{name:'Setor C',spaces:420,occupied:64},{name:'Setor D',spaces:400,occupied:69}],
+    m3:[{name:'Setor A',spaces:300,occupied:74},{name:'Setor B',spaces:280,occupied:61},{name:'Setor C',spaces:320,occupied:66},{name:'Setor D',spaces:300,occupied:63}],
+    m4:[{name:'Setor A',spaces:260,occupied:80},{name:'Setor B',spaces:240,occupied:69},{name:'Setor C',spaces:250,occupied:77},{name:'Setor D',spaces:250,occupied:65}],
+  },
+
+  reviews: [
+    { id:'r1', customerId:'cu1', mallId:'m1', rating:5, comment:'Estacionamento amplo e praça de alimentação muito boa. Voltarei sempre.', date:'2026-08-29', status:'Published' },
+    { id:'r2', customerId:'cu3', mallId:'m3', rating:5, comment:'Atendimento excelente na loja de eletrônicos, resolveram meu problema rápido.', date:'2026-08-30', status:'Published' },
+    { id:'r3', customerId:'cu5', mallId:'m1', rating:3, comment:'Fila grande no caixa do supermercado no fim de semana.', date:'2026-08-20', status:'Published' },
+    { id:'r4', customerId:'cu6', mallId:'m2', rating:4, comment:'Boa variedade de lojas, mas faltou sinalização para o estacionamento coberto.', date:'2026-08-28', status:'Pending' },
+    { id:'r5', customerId:'cu4', mallId:'m4', rating:5, comment:'Shopping mais organizado da região, equipe muito atenciosa.', date:'2026-08-31', status:'Published' },
+    { id:'r6', customerId:'cu2', mallId:'m2', rating:2, comment:'Ar-condicionado fraco no piso superior durante o verão.', date:'2026-08-25', status:'Flagged' },
+    { id:'r7', customerId:'cu7', mallId:'m3', rating:4, comment:'Cinema com ótima programação, só faltou mais opções vegetarianas na praça.', date:'2026-08-22', status:'Published' },
+    { id:'r8', customerId:'cu8', mallId:'m4', rating:5, comment:'Compra rápida e estacionamento gratuito na primeira hora, adorei.', date:'2026-08-27', status:'Published' },
+  ],
+
+  contracts: [
+    { id:'c1', storeId:'s1', mallId:'m1', start:'2023-03-01', end:'2027-02-28', value:18500, status:'Active' },
+    { id:'c2', storeId:'s2', mallId:'m1', start:'2022-06-15', end:'2026-09-30', value:26200, status:'Expiring Soon' },
+    { id:'c3', storeId:'s3', mallId:'m1', start:'2021-11-01', end:'2026-10-31', value:9800, status:'Expiring Soon' },
+    { id:'c4', storeId:'s4', mallId:'m1', start:'2024-01-10', end:'2028-01-09', value:7900, status:'Active' },
+    { id:'c5', storeId:'s5', mallId:'m2', start:'2022-02-01', end:'2027-01-31', value:8700, status:'Active' },
+    { id:'c6', storeId:'s6', mallId:'m2', start:'2023-09-01', end:'2026-09-15', value:12400, status:'Expiring Soon' },
+    { id:'c7', storeId:'s7', mallId:'m2', start:'2020-05-01', end:'2025-04-30', value:6600, status:'Expired' },
+    { id:'c8', storeId:'s8', mallId:'m3', start:'2023-01-15', end:'2027-01-14', value:4900, status:'Active' },
+    { id:'c9', storeId:'s9', mallId:'m3', start:'2022-10-01', end:'2027-09-30', value:11200, status:'Active' },
+    { id:'c10', storeId:'s10', mallId:'m3', start:'2021-06-01', end:'2029-05-31', value:34500, status:'Active' },
+    { id:'c11', storeId:'s11', mallId:'m4', start:'2024-03-01', end:'2028-02-29', value:6100, status:'Active' },
+    { id:'c12', storeId:'s12', mallId:'m4', start:'2023-04-01', end:'2026-09-20', value:4300, status:'Expiring Soon' },
+    { id:'c13', storeId:'s13', mallId:'m4', start:'2020-08-01', end:'2025-07-31', value:5200, status:'Suspended' },
+    { id:'c14', storeId:'s14', mallId:'m1', start:'2023-05-01', end:'2027-04-30', value:6800, status:'Active' },
+    { id:'c15', storeId:'s15', mallId:'m2', start:'2024-02-01', end:'2028-01-31', value:9100, status:'Active' },
+  ],
+
+  activity: [
+    { icon:'store', color:'success', text:'Nova loja <b>Mundo Kids Brinquedos</b> foi cadastrada em <b>Mall Central</b>', time:'5 min atrás' },
+    { icon:'file-signature', color:'info', text:'Contrato da <b>TechZone</b> foi renovado por mais 4 anos', time:'32 min atrás' },
+    { icon:'star', color:'warning', text:'Nova avaliação de 5★ recebida para <b>Mall Riverside</b>', time:'1 hora atrás' },
+    { icon:'car', color:'accent', text:'Capacidade do Setor C atualizada em <b>Shopping Norte</b>', time:'2 horas atrás' },
+    { icon:'user-plus', color:'success', text:'Funcionário <b>Bruno Cardoso</b> adicionado à <b>TechZone</b>', time:'3 horas atrás' },
+    { icon:'circle-alert', color:'danger', text:'Status da <b>Vitrine Jeans</b> alterado para Inativo', time:'Ontem' },
+    { icon:'file-signature', color:'warning', text:'Contrato da <b>Café Central</b> expira em 30 dias', time:'Ontem' },
+    { icon:'star', color:'warning', text:'Avaliação sinalizada para revisão em <b>Shopping Norte</b>', time:'2 dias atrás' },
+  ],
+
+  months: ['Set','Out','Nov','Dez','Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago'],
+  revenueTrend: [1620,1710,1590,1980,2050,2140,2280,2190,2350,2410,2390,2480],
+  revenueTrend2: [1480,1550,1470,1790,1860,1920,2040,1990,2110,2160,2140,2210],
+  parkingDay: {labels:['6h','8h','10h','12h','14h','16h','18h','20h','22h'], data:[12,38,58,74,69,81,92,76,34]},
+};
+
+function nextId(prefix, arr){ return prefix + (arr.length + 1 + Math.floor(Math.random()*900)); }
+/* ============================================================
+   UTILITIES
+   ============================================================ */
+const fmtBRL = v => 'R$ ' + Number(v).toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0});
+const fmtBRLFull = v => 'R$ ' + Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmtDateBR = iso => { const d=new Date(iso+'T00:00:00'); return d.toLocaleDateString('pt-BR'); };
+const fmtNum = v => Number(v).toLocaleString('pt-BR');
+const initials = name => name.split(' ').filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase();
+
+function icon(name, cls){ return `<i data-lucide="${name}" class="${cls||''}"></i>`; }
+function renderIcons(){ if(window.lucide) lucide.createIcons(); }
+
+function mallById(id){ return DB.malls.find(m=>m.id===id); }
+function storeById(id){ return DB.stores.find(s=>s.id===id); }
+function customerById(id){ return DB.customers.find(c=>c.id===id); }
+function employeeById(id){ return DB.employees.find(e=>e.id===id); }
+function contractById(id){ return DB.contracts.find(c=>c.id===id); }
+function storesByMall(mallId){ return DB.stores.filter(s=>s.mallId===mallId); }
+
+function statusBadge(status){
+  const map = {
+    'Active':{cls:'badge-success', label:'Ativo'},
+    'Inactive':{cls:'badge-muted', label:'Inativo'},
+    'Maintenance':{cls:'badge-warning', label:'Manutenção'},
+    'Expiring Soon':{cls:'badge-warning', label:'Expirando'},
+    'Expired':{cls:'badge-danger', label:'Expirado'},
+    'Suspended':{cls:'badge-danger', label:'Suspenso'},
+    'Published':{cls:'badge-success', label:'Publicada'},
+    'Pending':{cls:'badge-warning', label:'Pendente'},
+    'Flagged':{cls:'badge-danger', label:'Sinalizada'},
+  };
+  const m = map[status] || {cls:'badge-muted', label:status};
+  return `<span class="badge ${m.cls}">${m.label}</span>`;
+}
+
+function starRow(rating, size){
+  let s='';
+  for(let i=1;i<=5;i++){
+    s += i<=Math.round(rating) ? icon('star') : icon('star');
+  }
+  return `<span class="stars">${Array.from({length:5}).map((_,i)=>
+    `<svg viewBox="0 0 24 24" fill="${i<Math.round(rating)?'currentColor':'none'}" stroke="currentColor" stroke-width="1.6"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`
+  ).join('')}</span>`;
+}
+
+/* ---------- Toasts ---------- */
+function toast(msg, type='success'){
+  const stack = document.getElementById('toast-stack');
+  const el = document.createElement('div');
+  el.className = 'toast ' + (type==='success'?'':type);
+  const iconName = type==='danger' ? 'circle-x' : type==='info' ? 'info' : 'circle-check';
+  el.innerHTML = `${icon(iconName)}<span>${msg}</span>`;
+  stack.appendChild(el);
+  renderIcons();
+  setTimeout(()=>{ el.style.opacity='0'; el.style.transform='translateX(12px)'; el.style.transition='.18s'; setTimeout(()=>el.remove(),180); }, 3200);
+}
+
+/* ---------- Modal ---------- */
+function openModal(html, size){
+  const root = document.getElementById('modal-root');
+  root.innerHTML = `<div class="modal-overlay" id="modalOverlay"><div class="modal-box ${size==='lg'?'modal-lg':''}">${html}</div></div>`;
+  renderIcons();
+  requestAnimationFrame(()=>document.getElementById('modalOverlay').classList.add('open'));
+  document.getElementById('modalOverlay').addEventListener('click', e=>{
+    if(e.target.id==='modalOverlay') closeModal();
+  });
+}
+function closeModal(){
+  const overlay = document.getElementById('modalOverlay');
+  if(!overlay) return;
+  overlay.classList.remove('open');
+  setTimeout(()=>{ document.getElementById('modal-root').innerHTML=''; }, 160);
+}
+function confirmModal(title, body, onConfirm, confirmLabel){
+  openModal(`
+    <div class="modal-head"><div class="modal-title">${title}</div>
+      <button class="modal-close" onclick="closeModal()">${icon('x')}</button></div>
+    <div class="modal-body"><p style="font-size:13px;color:var(--text-secondary);line-height:1.6">${body}</p></div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-danger" id="confirmBtn">${confirmLabel||'Confirmar'}</button>
+    </div>`);
+  document.getElementById('confirmBtn').addEventListener('click', ()=>{ onConfirm(); closeModal(); });
+}
+
+/* ---------- Simple table sort/filter helper ---------- */
+function matchSearch(text, query){
+  return String(text).toLowerCase().includes(query.trim().toLowerCase());
+}
+/* ============================================================
+   STATE
+   ============================================================ */
+const state = {
+  theme: 'dark',
+  sidebarCollapsed: false,
+  mobileOpen: false,
+  view: 'dashboard',
+  params: {},
+  selectedMall: 'all',
+  notifOpen: false,
+  filters: {}, // per-page filter/search state keyed by page
+};
+
+const NAV = [
+  { group:'Visão Geral', items:[
+    { id:'dashboard', label:'Dashboard', icon:'layout-dashboard' },
+  ]},
+  { group:'Gestão', items:[
+    { id:'malls', label:'Shopping Centers', icon:'building-2', count:()=>DB.malls.length },
+    { id:'stores', label:'Lojas', icon:'store', count:()=>DB.stores.length },
+    { id:'customers', label:'Clientes', icon:'users', count:()=>DB.customers.length },
+    { id:'employees', label:'Funcionários', icon:'id-card', count:()=>DB.employees.length },
+    { id:'parking', label:'Estacionamento', icon:'car', count:null },
+    { id:'reviews', label:'Avaliações', icon:'star', count:()=>DB.reviews.length },
+    { id:'contracts', label:'Contratos', icon:'file-signature', count:()=>DB.contracts.length },
+  ]},
+  { group:'Análises', items:[
+    { id:'analytics', label:'Analytics', icon:'bar-chart-3' },
+  ]},
+  { group:'Sistema', items:[
+    { id:'settings', label:'Configurações', icon:'settings' },
+  ]},
+];
+
+const NOTIFS = [
+  { icon:'file-signature', color:'warning', text:'3 contratos expiram nos próximos 30 dias', time:'12 min atrás' },
+  { icon:'star', color:'danger', text:'Avaliação sinalizada precisa de revisão', time:'1 hora atrás' },
+  { icon:'car', color:'accent', text:'Setor A do Mall Central atingiu 90% de ocupação', time:'3 horas atrás' },
+  { icon:'store', color:'success', text:'Nova loja aguardando aprovação de cadastro', time:'Ontem' },
+];
+
+function navigate(view, params={}){
+  state.view = view;
+  state.params = params;
+  state.mobileOpen = false;
+  window.scrollTo(0,0);
+  render();
+}
+
+/* ============================================================
+   SHELL: SIDEBAR
+   ============================================================ */
+function renderSidebar(){
+  const sb = document.getElementById('sidebar');
+  sb.className = (state.sidebarCollapsed?'collapsed ':'') + (state.mobileOpen?'mobile-open':'');
+  sb.innerHTML = `
+    <div class="brand">
+      <div class="brand-mark">M</div>
+      <div class="brand-text">
+        <div class="brand-name">MALLVERSE</div>
+        <div class="brand-sub">Shopping Network Intelligence</div>
+      </div>
+    </div>
+    <nav class="nav-scroll">
+      ${NAV.map(g=>`
+        <div class="nav-group">
+          <div class="nav-group-label">${g.group}</div>
+          ${g.items.map(it=>`
+            <div class="nav-item ${state.view===it.id?'active':''}" data-nav="${it.id}">
+              ${icon(it.icon)}
+              <span>${it.label}</span>
+              ${it.count ? `<span class="badge-count">${it.count()}</span>` : ''}
+            </div>
+          `).join('')}
+        </div>
+      `).join('')}
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-row" data-nav="settings">
+        <div class="avatar">AD</div>
+        <div class="user-meta">
+          <div class="user-name">Admin Mallverse</div>
+          <div class="user-role">Administrador da Rede</div>
+        </div>
+      </div>
+      <button class="collapse-toggle" id="collapseBtn">
+        ${icon(state.sidebarCollapsed?'panel-left-open':'panel-left-close')}
+        ${state.sidebarCollapsed?'':'<span>Recolher menu</span>'}
+      </button>
+    </div>
+  `;
+  sb.querySelectorAll('[data-nav]').forEach(el=>{
+    el.addEventListener('click', ()=>navigate(el.dataset.nav));
+  });
+  document.getElementById('collapseBtn').addEventListener('click', ()=>{
+    state.sidebarCollapsed = !state.sidebarCollapsed;
+    renderSidebar();
+  });
+}
+
+/* ============================================================
+   SHELL: TOPBAR
+   ============================================================ */
+const VIEW_TITLES = {
+  dashboard:'Dashboard', malls:'Shopping Centers', mallDetail:'Detalhes do Shopping',
+  stores:'Lojas', storeDetail:'Detalhes da Loja', customers:'Clientes', customerDetail:'Detalhes do Cliente',
+  employees:'Funcionários', employeeDetail:'Detalhes do Funcionário', parking:'Estacionamento',
+  reviews:'Avaliações', contracts:'Contratos', analytics:'Analytics', settings:'Configurações',
+};
+
+function renderTopbar(){
+  const tb = document.getElementById('topbar');
+  tb.innerHTML = `
+    <button class="mobile-menu-btn" id="mobileMenuBtn">${icon('menu')}</button>
+    <div class="topbar-search">
+      ${icon('search')}
+      <input type="text" placeholder="Buscar shoppings, lojas, clientes..." id="globalSearch">
+    </div>
+    <div class="topbar-right">
+      <div class="mall-select" id="mallSelectBtn">
+        ${icon('building-2')}
+        <span id="mallSelectLabel">${state.selectedMall==='all'?'Todos os Shoppings':mallById(state.selectedMall).name}</span>
+        ${icon('chevron-down')}
+      </div>
+      <button class="icon-btn" id="themeToggleBtn" title="Alternar tema">${icon(state.theme==='dark'?'sun':'moon')}</button>
+      <button class="icon-btn" id="notifBtn" title="Notificações">${icon('bell')}<span class="notif-dot"></span></button>
+      <div class="avatar" style="cursor:pointer" data-nav="settings">AD</div>
+    </div>
+  `;
+  document.getElementById('mobileMenuBtn').addEventListener('click', ()=>{
+    state.mobileOpen = !state.mobileOpen;
+    renderSidebar();
+    document.getElementById('mobileOverlay').classList.toggle('open', state.mobileOpen);
+  });
+  document.getElementById('mobileOverlay').addEventListener('click', ()=>{
+    state.mobileOpen = false; renderSidebar();
+    document.getElementById('mobileOverlay').classList.remove('open');
+  });
+  document.getElementById('themeToggleBtn').addEventListener('click', toggleTheme);
+  document.getElementById('notifBtn').addEventListener('click', toggleNotifPanel);
+  tb.querySelector('[data-nav]').addEventListener('click', ()=>navigate('settings'));
+  document.getElementById('mallSelectBtn').addEventListener('click', openMallSelectMenu);
+
+  const searchInput = document.getElementById('globalSearch');
+  searchInput.addEventListener('keydown', e=>{
+    if(e.key==='Enter' && searchInput.value.trim()){
+      toast(`Buscando por "${searchInput.value}"…`, 'info');
+    }
+  });
+}
+
+function openMallSelectMenu(e){
+  e.stopPropagation();
+  const existing = document.getElementById('mallDropdown');
+  if(existing){ existing.remove(); return; }
+  const btn = document.getElementById('mallSelectBtn');
+  const rect = btn.getBoundingClientRect();
+  const dd = document.createElement('div');
+  dd.id = 'mallDropdown';
+  dd.style.cssText = `position:fixed;top:${rect.bottom+6}px;right:${window.innerWidth-rect.right}px;background:var(--bg-elevated);border:1px solid var(--border-soft);border-radius:10px;box-shadow:var(--shadow-lg);z-index:80;min-width:200px;padding:6px;`;
+  const opts = [{id:'all',name:'Todos os Shoppings'}, ...DB.malls];
+  dd.innerHTML = opts.map(o=>`<div class="nav-item" style="color:var(--text)" data-mall="${o.id}">${o.name}</div>`).join('');
+  document.body.appendChild(dd);
+  dd.querySelectorAll('[data-mall]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      state.selectedMall = el.dataset.mall;
+      dd.remove();
+      render();
+    });
+  });
+  setTimeout(()=>document.addEventListener('click', function h(ev){ if(!dd.contains(ev.target)){ dd.remove(); document.removeEventListener('click',h);} }),0);
+}
+
+function toggleTheme(){
+  state.theme = state.theme==='dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', state.theme);
+  renderTopbar();
+  if(charts.revenue) refreshChartsTheme();
+}
+
+function toggleNotifPanel(){
+  const existing = document.getElementById('notifPanel');
+  if(existing){ existing.remove(); return; }
+  const panel = document.createElement('div');
+  panel.id = 'notifPanel';
+  panel.className = 'notif-panel';
+  panel.innerHTML = `
+    <div class="notif-panel-head"><span>Notificações</span><span class="badge badge-info">${NOTIFS.length} novas</span></div>
+    <div class="notif-panel-body">
+      ${NOTIFS.map(n=>`
+        <div class="notif-item">
+          <div class="activity-icon" style="background:var(--${n.color}-soft);color:var(--${n.color})">${icon(n.icon)}</div>
+          <div class="activity-body">
+            <div class="activity-text">${n.text}</div>
+            <div class="activity-time">${n.time}</div>
+          </div>
+        </div>
+      `).join('')}
+    </div>`;
+  document.getElementById('app').appendChild(panel);
+  renderIcons();
+  requestAnimationFrame(()=>panel.classList.add('open'));
+  setTimeout(()=>document.addEventListener('click', function h(ev){
+    if(!panel.contains(ev.target) && ev.target.id!=='notifBtn'){ panel.remove(); document.removeEventListener('click',h);}
+  }),0);
+}
+
+/* ============================================================
+   ROUTER / MAIN RENDER
+   ============================================================ */
+const VIEW_RENDERERS = {}; // populated by pages.js
+
+function render(){
+  renderSidebar();
+  renderTopbar();
+  const root = document.getElementById('view-root');
+  const fn = VIEW_RENDERERS[state.view] || VIEW_RENDERERS.dashboard;
+  root.innerHTML = fn(state.params);
+  renderIcons();
+  attachViewHandlers(state.view, state.params);
+}
+/* ============================================================
+   CHARTS
+   ============================================================ */
+const charts = {};
+
+function cssVar(name){
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+
+function destroyChart(key){ if(charts[key]){ charts[key].destroy(); delete charts[key]; } }
+
+function baseGrid(){
+  return { color: cssVar('--border-soft'), drawTicks:false };
+}
+function baseTicks(){
+  return { color: cssVar('--text-muted'), font:{ family:'Inter', size:11 } };
+}
+
+function buildRevenueChart(){
+  const ctx = document.getElementById('revenueChart');
+  if(!ctx) return;
+  destroyChart('revenue');
+  const grad = ctx.getContext('2d').createLinearGradient(0,0,0,220);
+  grad.addColorStop(0, 'rgba(245,166,35,0.28)');
+  grad.addColorStop(1, 'rgba(245,166,35,0.0)');
+  charts.revenue = new Chart(ctx, {
+    type:'line',
+    data:{
+      labels: DB.months,
+      datasets:[
+        { label:'Receita 2026', data:DB.revenueTrend, borderColor:cssVar('--accent'), backgroundColor:grad, fill:true, tension:.4, pointRadius:0, borderWidth:2.5 },
+        { label:'Receita 2025', data:DB.revenueTrend2, borderColor:cssVar('--accent-2'), borderDash:[4,4], backgroundColor:'transparent', fill:false, tension:.4, pointRadius:0, borderWidth:2 },
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      interaction:{ mode:'index', intersect:false },
+      plugins:{ legend:{ display:true, position:'top', align:'end', labels:{ color:cssVar('--text-secondary'), boxWidth:10, boxHeight:10, usePointStyle:true, font:{size:11.5} } },
+        tooltip:{ backgroundColor:cssVar('--bg-elevated'), titleColor:cssVar('--text'), bodyColor:cssVar('--text-secondary'), borderColor:cssVar('--border'), borderWidth:1, padding:10,
+          callbacks:{ label: c => ` ${c.dataset.label}: ${fmtBRL(c.raw*1000)}` } } },
+      scales:{
+        x:{ grid:{ display:false }, ticks:baseTicks() },
+        y:{ grid:baseGrid(), ticks:{ ...baseTicks(), callback:v=>'R$'+v/1+'k' } }
+      }
+    }
+  });
+}
+
+function buildOccupancyChart(){
+  const ctx = document.getElementById('occupancyChart');
+  if(!ctx) return;
+  destroyChart('occupancy');
+  charts.occupancy = new Chart(ctx, {
+    type:'bar',
+    data:{
+      labels: DB.malls.map(m=>m.name),
+      datasets:[
+        { label:'Ocupadas', data:DB.malls.map(m=>Math.round(m.stores*m.occupancy/100)), backgroundColor:cssVar('--accent'), borderRadius:5, maxBarThickness:26 },
+        { label:'Disponíveis', data:DB.malls.map(m=>m.stores-Math.round(m.stores*m.occupancy/100)), backgroundColor:cssVar('--panel-3'), borderRadius:5, maxBarThickness:26 },
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ position:'top', align:'end', labels:{ color:cssVar('--text-secondary'), boxWidth:10, boxHeight:10, usePointStyle:true, font:{size:11.5} } },
+        tooltip:{ backgroundColor:cssVar('--bg-elevated'), titleColor:cssVar('--text'), bodyColor:cssVar('--text-secondary'), borderColor:cssVar('--border'), borderWidth:1, padding:10 } },
+      scales:{
+        x:{ stacked:true, grid:{ display:false }, ticks:baseTicks() },
+        y:{ stacked:true, grid:baseGrid(), ticks:baseTicks() }
+      }
+    }
+  });
+}
+
+function buildCategoryDonut(){
+  const ctx = document.getElementById('categoryDonut');
+  if(!ctx) return;
+  destroyChart('category');
+  const counts = CATS.map(c=>DB.stores.filter(s=>s.category===c).length);
+  const colors = [cssVar('--accent'), cssVar('--accent-2'), cssVar('--success'), cssVar('--info'), cssVar('--warning'), cssVar('--text-muted')];
+  charts.category = new Chart(ctx, {
+    type:'doughnut',
+    data:{ labels: CATS.map(c=>CAT_LABEL_PT[c]), datasets:[{ data:counts, backgroundColor:colors, borderWidth:0, hoverOffset:4 }] },
+    options:{
+      responsive:true, maintainAspectRatio:false, cutout:'68%',
+      plugins:{ legend:{ position:'bottom', labels:{ color:cssVar('--text-secondary'), boxWidth:9, boxHeight:9, usePointStyle:true, padding:12, font:{size:11} } },
+        tooltip:{ backgroundColor:cssVar('--bg-elevated'), titleColor:cssVar('--text'), bodyColor:cssVar('--text-secondary'), borderColor:cssVar('--border'), borderWidth:1, padding:10 } }
+    }
+  });
+}
+
+function buildParkingChart(mallId){
+  const ctx = document.getElementById('parkingChart');
+  if(!ctx) return;
+  destroyChart('parking');
+  const d = DB.parkingDay;
+  const grad = ctx.getContext('2d').createLinearGradient(0,0,0,180);
+  grad.addColorStop(0, 'rgba(45,212,232,0.30)');
+  grad.addColorStop(1, 'rgba(45,212,232,0.0)');
+  charts.parking = new Chart(ctx, {
+    type:'line',
+    data:{ labels:d.labels, datasets:[{ label:'Ocupação (%)', data:d.data, borderColor:cssVar('--accent-2'), backgroundColor:grad, fill:true, tension:.45, pointRadius:0, borderWidth:2.5 }] },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ display:false }, tooltip:{ backgroundColor:cssVar('--bg-elevated'), titleColor:cssVar('--text'), bodyColor:cssVar('--text-secondary'), borderColor:cssVar('--border'), borderWidth:1, padding:10, callbacks:{ label:c=>` ${c.raw}% ocupado` } } },
+      scales:{ x:{ grid:{ display:false }, ticks:baseTicks() }, y:{ min:0, max:100, grid:baseGrid(), ticks:{ ...baseTicks(), callback:v=>v+'%' } } }
+    }
+  });
+}
+
+function buildAnalyticsRevenueChart(){
+  const ctx = document.getElementById('anRevenueChart');
+  if(!ctx) return;
+  destroyChart('anRevenue');
+  charts.anRevenue = new Chart(ctx, {
+    type:'bar',
+    data:{ labels: DB.malls.map(m=>m.name), datasets:[{ label:'Receita mensal', data: DB.malls.map(m=>m.revenue/1000), backgroundColor:[cssVar('--accent'),cssVar('--accent-2'),cssVar('--success'),cssVar('--info')], borderRadius:6, maxBarThickness:46 }] },
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ display:false }, tooltip:{ backgroundColor:cssVar('--bg-elevated'), titleColor:cssVar('--text'), bodyColor:cssVar('--text-secondary'), borderColor:cssVar('--border'), borderWidth:1, padding:10, callbacks:{ label:c=>` ${fmtBRL(c.raw*1000)}` } } },
+      scales:{ x:{ grid:{ display:false }, ticks:baseTicks() }, y:{ grid:baseGrid(), ticks:{ ...baseTicks(), callback:v=>'R$'+v+'k' } } } }
+  });
+}
+
+function buildAnalyticsSatisfactionChart(){
+  const ctx = document.getElementById('anSatisfactionChart');
+  if(!ctx) return;
+  destroyChart('anSat');
+  charts.anSat = new Chart(ctx, {
+    type:'radar',
+    data:{ labels: DB.malls.map(m=>m.name), datasets:[{ label:'Satisfação', data: DB.malls.map(m=>m.satisfaction), backgroundColor:'rgba(245,166,35,0.18)', borderColor:cssVar('--accent'), pointBackgroundColor:cssVar('--accent'), borderWidth:2 }] },
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ display:false } },
+      scales:{ r:{ min:0, max:5, angleLines:{ color:cssVar('--border-soft') }, grid:{ color:cssVar('--border-soft') }, pointLabels:{ color:cssVar('--text-secondary'), font:{size:11} }, ticks:{ display:false, backdropColor:'transparent' } } } }
+  });
+}
+
+function refreshChartsTheme(){
+  buildRevenueChart(); buildOccupancyChart(); buildCategoryDonut();
+  if(document.getElementById('parkingChart')) buildParkingChart(state.params.mallId);
+  if(document.getElementById('anRevenueChart')) buildAnalyticsRevenueChart();
+  if(document.getElementById('anSatisfactionChart')) buildAnalyticsSatisfactionChart();
+}
+/* ============================================================
+   PAGE: DASHBOARD
+   ============================================================ */
+VIEW_RENDERERS.dashboard = function(){
+  const malls = state.selectedMall==='all' ? DB.malls : DB.malls.filter(m=>m.id===state.selectedMall);
+  const totalRevenue = malls.reduce((s,m)=>s+m.revenue,0);
+  const totalStores = malls.reduce((s,m)=>s+m.stores,0);
+  const avgOcc = (malls.reduce((s,m)=>s+m.occupancy,0)/malls.length).toFixed(1);
+  const activeContracts = DB.contracts.filter(c=>c.status==='Active' || c.status==='Expiring Soon').length;
+  const expiring = DB.contracts.filter(c=>c.status==='Expiring Soon').length;
+  const parkingTotal = malls.reduce((s,m)=>s+m.parkingTotal,0);
+  const parkingOcc = malls.reduce((s,m)=>s+m.parkingOccupied,0);
+  const parkingPct = ((parkingOcc/parkingTotal)*100).toFixed(0);
+  const avgSat = (malls.reduce((s,m)=>s+m.satisfaction,0)/malls.length).toFixed(1);
+
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('pt-BR', { weekday:'long', day:'numeric', month:'long' });
+
+  const kpis = [
+    { label:'Receita Total', value: fmtBRL(totalRevenue), trend:'+12.8%', up:true, cmp:'vs. mês anterior', icon:'circle-dollar-sign', color:'accent' },
+    { label:'Lojas Ativas', value: fmtNum(totalStores), trend:'+14', up:true, cmp:'novas este mês', icon:'store', color:'info' },
+    { label:'Taxa de Ocupação', value: avgOcc+'%', trend:'+3.2%', up:true, cmp:'vs. mês anterior', icon:'layout-grid', color:'success' },
+    { label:'Contratos Ativos', value: fmtNum(activeContracts), trend:`${expiring} expirando`, up:null, cmp:'em 30 dias', icon:'file-signature', color:'warning' },
+    { label:'Ocupação de Vagas', value: parkingPct+'%', trend:'-4.1%', up:false, cmp:'vs. mês anterior', icon:'car', color:'accent-2' },
+    { label:'Satisfação do Cliente', value: avgSat+' / 5', trend:'+0.3', up:true, cmp:'vs. mês anterior', icon:'smile', color:'success' },
+  ];
+
+  return `
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Bom dia, Admin</h1>
+        <p class="page-subtitle" style="text-transform:capitalize">${dateStr} · Aqui está o desempenho da sua rede hoje.</p>
+      </div>
+      <button class="btn btn-secondary" id="exportBtn">${icon('download')}Exportar relatório</button>
+    </div>
+
+    <div class="kpi-grid">
+      ${kpis.map(k=>`
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <div class="kpi-icon" style="background:var(--${k.color}-soft);color:var(--${k.color})">${icon(k.icon)}</div>
+          </div>
+          <div class="kpi-label">${k.label}</div>
+          <div class="kpi-value num">${k.value}</div>
+          <div class="kpi-trend">
+            ${k.up===null?'':`<span class="${k.up?'trend-up':'trend-down'}">${icon(k.up?'trending-up':'trending-down')} ${k.trend}</span>`}
+            ${k.up===null?`<span class="trend-up">${k.trend}</span>`:''}
+            <span class="kpi-trend-label">${k.cmp}</span>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+
+    <div class="dash-grid">
+      <div class="card">
+        <div class="card-head">
+          <div><div class="section-title">Visão Geral de Receita</div><div class="section-desc">Comparativo mensal, últimos 12 meses</div></div>
+        </div>
+        <div class="chart-wrap" style="height:260px"><canvas id="revenueChart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div><div class="section-title">Receita por Categoria</div><div class="section-desc">Distribuição por número de lojas</div></div>
+        </div>
+        <div class="chart-wrap" style="height:260px"><canvas id="categoryDonut"></canvas></div>
+      </div>
+    </div>
+
+    <div class="dash-grid">
+      <div class="card">
+        <div class="card-head">
+          <div><div class="section-title">Ocupação de Lojas por Shopping</div><div class="section-desc">Ocupadas vs. disponíveis</div></div>
+        </div>
+        <div class="chart-wrap" style="height:250px"><canvas id="occupancyChart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div><div class="section-title">Atividade Recente</div><div class="section-desc">Últimas atualizações da rede</div></div>
+          <button class="btn btn-ghost btn-sm" data-nav="analytics">Ver tudo</button>
+        </div>
+        <div class="activity-list">
+          ${DB.activity.slice(0,6).map(a=>`
+            <div class="activity-item">
+              <div class="activity-icon" style="background:var(--${a.color}-soft);color:var(--${a.color})">${icon(a.icon)}</div>
+              <div class="activity-body">
+                <div class="activity-text">${a.text}</div>
+                <div class="activity-time">${a.time}</div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+};
+/* ============================================================
+   PAGE: SHOPPING MALLS (list)
+   ============================================================ */
+VIEW_RENDERERS.malls = function(){
+  const f = state.filters.malls || (state.filters.malls = { q:'', status:'all' });
+  let list = DB.malls.filter(m =>
+    (f.status==='all' || m.status===f.status) &&
+    (matchSearch(m.name, f.q) || matchSearch(m.city, f.q))
+  );
+
+  return `
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Shopping Centers</h1>
+        <p class="page-subtitle">Gerencie e monitore todas as unidades da sua rede.</p>
+      </div>
+      <button class="btn btn-primary" id="addMallBtn">${icon('plus')}Adicionar Shopping</button>
+    </div>
+
+    <div class="table-toolbar" style="background:var(--panel);border:1px solid var(--border-soft);border-radius:var(--radius-lg);margin-bottom:16px">
+      <div class="search-box">${icon('search')}<input id="mallSearch" placeholder="Buscar por nome ou cidade..." value="${f.q}"></div>
+      <select class="select-filter" id="mallStatusFilter">
+        <option value="all" ${f.status==='all'?'selected':''}>Todos os status</option>
+        <option value="Active" ${f.status==='Active'?'selected':''}>Ativo</option>
+        <option value="Maintenance" ${f.status==='Maintenance'?'selected':''}>Manutenção</option>
+        <option value="Inactive" ${f.status==='Inactive'?'selected':''}>Inativo</option>
+      </select>
+    </div>
+
+    ${list.length===0 ? emptyState('building-2','Nenhum shopping encontrado','Ajuste sua busca ou filtros para ver resultados.') : `
+    <div class="card-grid">
+      ${list.map(m=>`
+        <div class="mall-card" data-mall-open="${m.id}">
+          <div class="mall-card-top">
+            <div>
+              <div class="mall-card-name">${m.name}</div>
+              <div class="mall-card-loc">${icon('map-pin')}${m.city}, ${m.state}</div>
+            </div>
+            ${statusBadge(m.status)}
+          </div>
+          <div class="mall-stat-row">
+            <div class="mall-stat"><div class="mall-stat-val num">${m.stores}</div><div class="mall-stat-lbl">Lojas</div></div>
+            <div class="mall-stat"><div class="mall-stat-val num">${m.occupancy}%</div><div class="mall-stat-lbl">Ocupação</div></div>
+            <div class="mall-stat"><div class="mall-stat-val num">${fmtBRL(m.revenue)}</div><div class="mall-stat-lbl">Receita/mês</div></div>
+            <div class="mall-stat"><div class="mall-stat-val num">${fmtNum(m.parkingTotal)}</div><div class="mall-stat-lbl">Vagas</div></div>
+          </div>
+          <div class="mall-card-foot">
+            <span>CNPJ ${m.cnpj}</span>
+            <span>Atualizado em ${fmtDateBR(m.updated)}</span>
+          </div>
+        </div>
+      `).join('')}
+    </div>`}
+  `;
+};
+
+function emptyState(iconName, title, desc){
+  return `<div class="table-card"><div class="empty-state">${icon(iconName)}<h3>${title}</h3><p>${desc}</p></div></div>`;
+}
+
+/* ============================================================
+   PAGE: MALL DETAIL
+   ============================================================ */
+VIEW_RENDERERS.mallDetail = function(params){
+  const m = mallById(params.mallId);
+  if(!m) return emptyState('building-2','Shopping não encontrado','Volte e selecione um shopping válido.');
+  const stores = storesByMall(m.id);
+  const contracts = DB.contracts.filter(c=>c.mallId===m.id);
+  const activity = DB.activity.filter((_,i)=>i%2===(m.id==='m1'?0:1)).slice(0,4);
+  const catCounts = CATS.map(c=>({cat:c, count:stores.filter(s=>s.category===c).length})).filter(c=>c.count>0);
+  const maxCat = Math.max(...catCounts.map(c=>c.count),1);
+
+  return `
+    <div class="detail-back" data-nav="malls">${icon('arrow-left')}Voltar para Shopping Centers</div>
+    <div class="detail-hero">
+      <div class="detail-hero-left">
+        <div class="detail-avatar">${initials(m.name)}</div>
+        <div>
+          <div class="detail-title">${m.name}</div>
+          <div class="detail-meta">
+            <span>${icon('map-pin')}${m.city}, ${m.state}</span>
+            <span>${icon('hash')}CNPJ ${m.cnpj}</span>
+            <span>${statusBadge(m.status)}</span>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-secondary" id="editMallBtn">${icon('pencil')}Editar</button>
+        <button class="btn btn-secondary" id="addStoreFromMallBtn">${icon('plus')}Adicionar Loja</button>
+        <button class="btn btn-secondary" data-nav="parking" data-nav-params='{"mallId":"${m.id}"}'>${icon('car')}Ver Estacionamento</button>
+      </div>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="kpi-label">Receita Mensal</div><div class="kpi-value num">${fmtBRL(m.revenue)}</div></div>
+      <div class="kpi-card"><div class="kpi-label">Ocupação de Lojas</div><div class="kpi-value num">${m.occupancy}%</div></div>
+      <div class="kpi-card"><div class="kpi-label">Ocupação de Vagas</div><div class="kpi-value num">${((m.parkingOccupied/m.parkingTotal)*100).toFixed(0)}%</div></div>
+      <div class="kpi-card"><div class="kpi-label">Satisfação do Cliente</div><div class="kpi-value num">${m.satisfaction} / 5</div></div>
+    </div>
+
+    <div class="dash-grid">
+      <div class="card card-pad">
+        <div class="section-title" style="margin-bottom:14px">Distribuição de Lojas por Categoria</div>
+        ${catCounts.map(c=>`
+          <div class="rating-bar-row">
+            <span class="lbl" style="width:110px">${CAT_LABEL_PT[c.cat]}</span>
+            <div class="progress-track"><div class="progress-fill" style="width:${(c.count/maxCat)*100}%;background:var(--accent-2)"></div></div>
+            <span class="pct">${c.count}</span>
+          </div>
+        `).join('')}
+        <div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--border-soft)">
+          <div class="section-title" style="margin-bottom:10px;font-size:13px">Estacionamento</div>
+          <div style="display:flex;justify-content:space-between;font-size:12.5px;color:var(--text-secondary);margin-bottom:6px">
+            <span>${fmtNum(m.parkingOccupied)} ocupadas de ${fmtNum(m.parkingTotal)}</span>
+            <span>${((m.parkingOccupied/m.parkingTotal)*100).toFixed(0)}%</span>
+          </div>
+          <div class="progress-track"><div class="progress-fill" style="width:${(m.parkingOccupied/m.parkingTotal)*100}%"></div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="section-title">Atividade Recente</div></div>
+        <div class="activity-list">
+          ${activity.map(a=>`
+            <div class="activity-item">
+              <div class="activity-icon" style="background:var(--${a.color}-soft);color:var(--${a.color})">${icon(a.icon)}</div>
+              <div class="activity-body"><div class="activity-text">${a.text}</div><div class="activity-time">${a.time}</div></div>
+            </div>`).join('')}
+        </div>
+      </div>
+    </div>
+
+    <div class="table-card" style="margin-bottom:16px">
+      <div class="card-head" style="padding:16px 18px"><div class="section-title">Lojas neste Shopping (${stores.length})</div>
+        <button class="btn btn-ghost btn-sm" data-nav="stores">Ver todas</button></div>
+      <div class="table-scroll"><table>
+        <thead><tr><th>Loja</th><th>Unidade</th><th>Categoria</th><th>Gerente</th><th>Status</th><th>Receita</th></tr></thead>
+        <tbody>
+          ${stores.map(s=>`
+            <tr class="clickable" data-store-open="${s.id}">
+              <td class="cell-primary">${s.name}</td><td class="cell-muted">${s.unit}</td>
+              <td>${CAT_LABEL_PT[s.category]}</td><td class="cell-muted">${s.manager}</td>
+              <td>${statusBadge(s.status)}</td><td class="num">${fmtBRL(s.revenue)}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table></div>
+    </div>
+
+    <div class="table-card">
+      <div class="card-head" style="padding:16px 18px"><div class="section-title">Contratos deste Shopping (${contracts.length})</div>
+        <button class="btn btn-ghost btn-sm" data-nav="contracts">Ver todos</button></div>
+      <div class="table-scroll"><table>
+        <thead><tr><th>Loja</th><th>Início</th><th>Término</th><th>Valor Mensal</th><th>Status</th></tr></thead>
+        <tbody>
+          ${contracts.map(c=>`
+            <tr><td class="cell-primary">${storeById(c.storeId)?.name||'—'}</td><td class="cell-muted">${fmtDateBR(c.start)}</td>
+              <td class="cell-muted">${fmtDateBR(c.end)}</td><td class="num">${fmtBRL(c.value)}</td><td>${statusBadge(c.status)}</td></tr>`).join('')}
+        </tbody>
+      </table></div>
+    </div>
+  `;
+};
+/* ============================================================
+   PAGE: STORES (list)
+   ============================================================ */
+VIEW_RENDERERS.stores = function(){
+  const f = state.filters.stores || (state.filters.stores = { q:'', mall:'all', category:'all', status:'all', sort:'name', dir:1 });
+  let list = DB.stores.filter(s =>
+    (f.mall==='all' || s.mallId===f.mall) &&
+    (f.category==='all' || s.category===f.category) &&
+    (f.status==='all' || s.status===f.status) &&
+    matchSearch(s.name, f.q)
+  );
+  list = sortList(list, f.sort, f.dir);
+
+  return `
+    <div class="page-header">
+      <div><h1 class="page-title">Lojas</h1><p class="page-subtitle">Gerencie todas as lojas da sua rede de shoppings.</p></div>
+      <button class="btn btn-primary" id="addStoreBtn">${icon('plus')}Adicionar Loja</button>
+    </div>
+
+    <div class="table-card">
+      <div class="table-toolbar">
+        <div class="search-box">${icon('search')}<input id="storeSearch" placeholder="Buscar loja..." value="${f.q}"></div>
+        <select class="select-filter" id="storeMallFilter">
+          <option value="all">Todos os shoppings</option>
+          ${DB.malls.map(m=>`<option value="${m.id}" ${f.mall===m.id?'selected':''}>${m.name}</option>`).join('')}
+        </select>
+        <select class="select-filter" id="storeCatFilter">
+          <option value="all">Todas as categorias</option>
+          ${CATS.map(c=>`<option value="${c}" ${f.category===c?'selected':''}>${CAT_LABEL_PT[c]}</option>`).join('')}
+        </select>
+        <select class="select-filter" id="storeStatusFilter">
+          <option value="all">Todos os status</option>
+          <option value="Active" ${f.status==='Active'?'selected':''}>Ativo</option>
+          <option value="Maintenance" ${f.status==='Maintenance'?'selected':''}>Manutenção</option>
+          <option value="Inactive" ${f.status==='Inactive'?'selected':''}>Inativo</option>
+        </select>
+      </div>
+      ${list.length===0 ? `<div class="empty-state">${icon('store')}<h3>Nenhuma loja encontrada</h3><p>Ajuste sua busca ou filtros.</p></div>` : `
+      <div class="table-scroll"><table>
+        <thead><tr>
+          <th data-sort="name">Loja</th><th data-sort="mallId">Shopping</th><th>Unidade</th>
+          <th data-sort="category">Categoria</th><th>Gerente</th><th data-sort="status">Status</th>
+          <th data-sort="revenue">Receita</th><th></th>
+        </tr></thead>
+        <tbody>
+          ${list.map(s=>`
+            <tr class="clickable" data-store-open="${s.id}">
+              <td><div class="cell-with-avatar"><div class="mini-avatar">${initials(s.name)}</div><span class="cell-primary">${s.name}</span></div></td>
+              <td class="cell-muted">${mallById(s.mallId)?.name||'—'}</td>
+              <td class="cell-muted">${s.unit}</td>
+              <td>${CAT_LABEL_PT[s.category]}</td>
+              <td class="cell-muted">${s.manager}</td>
+              <td>${statusBadge(s.status)}</td>
+              <td class="num">${fmtBRL(s.revenue)}</td>
+              <td>
+                <div class="row-actions">
+                  <button class="icon-btn btn-sm" data-store-edit="${s.id}" title="Editar">${icon('pencil')}</button>
+                  <button class="icon-btn btn-sm" data-store-delete="${s.id}" title="Excluir">${icon('trash-2')}</button>
+                </div>
+              </td>
+            </tr>`).join('')}
+        </tbody>
+      </table></div>
+      <div class="table-footer"><span>${list.length} de ${DB.stores.length} lojas</span><span>Página 1 de 1</span></div>`}
+    </div>
+  `;
+};
+
+function sortList(list, key, dir){
+  return [...list].sort((a,b)=>{
+    let av=a[key], bv=b[key];
+    if(typeof av==='string') return av.localeCompare(bv)*dir;
+    return (av-bv)*dir;
+  });
+}
+
+/* ============================================================
+   PAGE: STORE DETAIL
+   ============================================================ */
+VIEW_RENDERERS.storeDetail = function(params){
+  const s = storeById(params.storeId);
+  if(!s) return emptyState('store','Loja não encontrada','Volte e selecione uma loja válida.');
+  const mall = mallById(s.mallId);
+  const contract = contractById(s.contractId);
+  const emps = DB.employees.filter(e=>e.storeId===s.id);
+  const tab = state.params.tab || 'overview';
+
+  const tabs = [ {id:'overview',label:'Visão Geral'}, {id:'employees',label:'Funcionários'}, {id:'contract',label:'Contrato'}, {id:'reviews',label:'Avaliações'} ];
+
+  return `
+    <div class="detail-back" data-nav="stores">${icon('arrow-left')}Voltar para Lojas</div>
+    <div class="detail-hero">
+      <div class="detail-hero-left">
+        <div class="detail-avatar">${initials(s.name)}</div>
+        <div>
+          <div class="detail-title">${s.name}</div>
+          <div class="detail-meta">
+            <span>${icon('building-2')}${mall?.name}</span>
+            <span>${icon('map-pin')}Unidade ${s.unit}</span>
+            <span>${statusBadge(s.status)}</span>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-secondary" data-store-edit="${s.id}">${icon('pencil')}Editar</button>
+        <button class="btn btn-danger" data-store-delete="${s.id}">${icon('trash-2')}Excluir</button>
+      </div>
+    </div>
+
+    <div class="tabs">
+      ${tabs.map(t=>`<div class="tab-btn ${tab===t.id?'active':''}" data-store-tab="${t.id}">${t.label}</div>`).join('')}
+    </div>
+
+    ${tab==='overview' ? `
+      <div class="kpi-grid">
+        <div class="kpi-card"><div class="kpi-label">Categoria</div><div class="kpi-value" style="font-size:17px">${CAT_LABEL_PT[s.category]}</div></div>
+        <div class="kpi-card"><div class="kpi-label">Receita Mensal</div><div class="kpi-value num">${fmtBRL(s.revenue)}</div></div>
+        <div class="kpi-card"><div class="kpi-label">Funcionários</div><div class="kpi-value num">${emps.length}</div></div>
+        <div class="kpi-card"><div class="kpi-label">Gerente</div><div class="kpi-value" style="font-size:15px">${s.manager}</div></div>
+      </div>
+      <div class="card card-pad">
+        <div class="section-title" style="margin-bottom:12px">Informações da Loja</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;font-size:13px">
+          <div><div class="text-muted" style="color:var(--text-muted);font-size:11.5px;margin-bottom:4px">Shopping</div>${mall?.name}</div>
+          <div><div style="color:var(--text-muted);font-size:11.5px;margin-bottom:4px">Unidade</div>${s.unit}</div>
+          <div><div style="color:var(--text-muted);font-size:11.5px;margin-bottom:4px">Categoria</div>${CAT_LABEL_PT[s.category]}</div>
+          <div><div style="color:var(--text-muted);font-size:11.5px;margin-bottom:4px">Status</div>${statusBadge(s.status)}</div>
+        </div>
+      </div>
+    ` : ''}
+
+    ${tab==='employees' ? `
+      <div class="table-card">
+        <div class="card-head" style="padding:16px 18px"><div class="section-title">Funcionários (${emps.length})</div>
+          <button class="btn btn-secondary btn-sm" id="addEmployeeFromStoreBtn">${icon('plus')}Adicionar</button></div>
+        ${emps.length===0 ? `<div class="empty-state">${icon('id-card')}<h3>Nenhum funcionário</h3><p>Esta loja ainda não possui funcionários cadastrados.</p></div>` : `
+        <div class="table-scroll"><table>
+          <thead><tr><th>Nome</th><th>Cargo</th><th>Status</th><th>Início</th></tr></thead>
+          <tbody>${emps.map(e=>`<tr class="clickable" data-employee-open="${e.id}"><td class="cell-primary">${e.name}</td><td class="cell-muted">${e.position}</td><td>${statusBadge(e.status)}</td><td class="cell-muted">${fmtDateBR(e.startDate)}</td></tr>`).join('')}</tbody>
+        </table></div>`}
+      </div>
+    ` : ''}
+
+    ${tab==='contract' ? (contract ? `
+      <div class="card card-pad">
+        <div class="section-title" style="margin-bottom:14px">Contrato de Arrendamento</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:18px;font-size:13px">
+          <div><div style="color:var(--text-muted);font-size:11.5px;margin-bottom:4px">Início</div>${fmtDateBR(contract.start)}</div>
+          <div><div style="color:var(--text-muted);font-size:11.5px;margin-bottom:4px">Término</div>${fmtDateBR(contract.end)}</div>
+          <div><div style="color:var(--text-muted);font-size:11.5px;margin-bottom:4px">Valor Mensal</div>${fmtBRL(contract.value)}</div>
+          <div><div style="color:var(--text-muted);font-size:11.5px;margin-bottom:4px">Status</div>${statusBadge(contract.status)}</div>
+        </div>
+      </div>` : emptyState('file-signature','Sem contrato vinculado','Esta loja não possui contrato registrado.')) : ''}
+
+    ${tab==='reviews' ? (() => {
+      const revs = DB.reviews.filter(r=>r.mallId===s.mallId).slice(0,4);
+      return revs.length ? revs.map(r=>reviewCardHtml(r)).join('') : emptyState('star','Nenhuma avaliação','Sem avaliações vinculadas a este shopping ainda.');
+    })() : ''}
+  `;
+};
+
+function reviewCardHtml(r){
+  const c = customerById(r.customerId);
+  return `
+    <div class="review-card">
+      <div class="review-top">
+        <div><div class="cell-primary">${c?.name||'Cliente'}</div>${starRow(r.rating)}</div>
+        ${statusBadge(r.status)}
+      </div>
+      <p class="review-comment">${r.comment}</p>
+      <div class="review-foot"><span>${mallById(r.mallId)?.name}</span><span>${fmtDateBR(r.date)}</span></div>
+    </div>`;
+}
+/* ============================================================
+   PAGE: CUSTOMERS
+   ============================================================ */
+VIEW_RENDERERS.customers = function(){
+  const f = state.filters.customers || (state.filters.customers = { q:'', status:'all' });
+  let list = DB.customers.filter(c => (f.status==='all'||c.status===f.status) && (matchSearch(c.name,f.q) || matchSearch(c.cpf,f.q)));
+
+  return `
+    <div class="page-header">
+      <div><h1 class="page-title">Clientes</h1><p class="page-subtitle">Cadastro, avaliações e histórico de interações dos clientes.</p></div>
+      <button class="btn btn-primary" id="addCustomerBtn">${icon('plus')}Adicionar Cliente</button>
+    </div>
+    <div class="table-card">
+      <div class="table-toolbar">
+        <div class="search-box">${icon('search')}<input id="customerSearch" placeholder="Buscar por nome ou CPF..." value="${f.q}"></div>
+        <select class="select-filter" id="customerStatusFilter">
+          <option value="all">Todos os status</option>
+          <option value="Active" ${f.status==='Active'?'selected':''}>Ativo</option>
+          <option value="Inactive" ${f.status==='Inactive'?'selected':''}>Inativo</option>
+        </select>
+      </div>
+      ${list.length===0 ? `<div class="empty-state">${icon('users')}<h3>Nenhum cliente encontrado</h3><p>Ajuste sua busca ou filtros.</p></div>` : `
+      <div class="table-scroll"><table>
+        <thead><tr><th>Cliente</th><th>CPF</th><th>Telefone</th><th>Avaliações</th><th>Satisfação</th><th>Última Interação</th><th>Status</th><th></th></tr></thead>
+        <tbody>
+          ${list.map(c=>`
+            <tr class="clickable" data-customer-open="${c.id}">
+              <td><div class="cell-with-avatar"><div class="mini-avatar">${initials(c.name)}</div><span class="cell-primary">${c.name}</span></div></td>
+              <td class="cell-muted">${c.cpf}</td>
+              <td class="cell-muted">${c.phone}</td>
+              <td class="num">${c.reviews}</td>
+              <td class="num">${c.satisfaction.toFixed(1)}</td>
+              <td class="cell-muted">${fmtDateBR(c.lastInteraction)}</td>
+              <td>${statusBadge(c.status)}</td>
+              <td><div class="row-actions"><button class="icon-btn btn-sm" data-customer-delete="${c.id}">${icon('trash-2')}</button></div></td>
+            </tr>`).join('')}
+        </tbody>
+      </table></div>
+      <div class="table-footer"><span>${list.length} de ${DB.customers.length} clientes</span></div>`}
+    </div>
+  `;
+};
+
+VIEW_RENDERERS.customerDetail = function(params){
+  const c = customerById(params.customerId);
+  if(!c) return emptyState('users','Cliente não encontrado','Volte e selecione um cliente válido.');
+  const revs = DB.reviews.filter(r=>r.customerId===c.id);
+  return `
+    <div class="detail-back" data-nav="customers">${icon('arrow-left')}Voltar para Clientes</div>
+    <div class="detail-hero">
+      <div class="detail-hero-left">
+        <div class="detail-avatar">${initials(c.name)}</div>
+        <div>
+          <div class="detail-title">${c.name}</div>
+          <div class="detail-meta">
+            <span>${icon('hash')}${c.cpf}</span>
+            <span>${icon('phone')}${c.phone}</span>
+            <span>${statusBadge(c.status)}</span>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-danger" data-customer-delete="${c.id}">${icon('trash-2')}Excluir Cliente</button>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="kpi-label">Shopping Favorito</div><div class="kpi-value" style="font-size:16px">${mallById(c.mallId)?.name}</div></div>
+      <div class="kpi-card"><div class="kpi-label">Avaliações Feitas</div><div class="kpi-value num">${c.reviews}</div></div>
+      <div class="kpi-card"><div class="kpi-label">Satisfação Média</div><div class="kpi-value num">${c.satisfaction.toFixed(1)} / 5</div></div>
+      <div class="kpi-card"><div class="kpi-label">Última Interação</div><div class="kpi-value" style="font-size:16px">${fmtDateBR(c.lastInteraction)}</div></div>
+    </div>
+    <div class="section-title" style="margin:6px 0 12px">Histórico de Avaliações</div>
+    ${revs.length ? revs.map(r=>reviewCardHtml(r)).join('') : emptyState('star','Sem avaliações','Este cliente ainda não avaliou nenhum shopping.')}
+  `;
+};
+
+/* ============================================================
+   PAGE: EMPLOYEES
+   ============================================================ */
+VIEW_RENDERERS.employees = function(){
+  const f = state.filters.employees || (state.filters.employees = { q:'', mall:'all', store:'all', position:'all' });
+  let list = DB.employees.filter(e =>
+    (f.mall==='all' || e.mallId===f.mall) &&
+    (f.store==='all' || e.storeId===f.store) &&
+    (f.position==='all' || e.position===f.position) &&
+    matchSearch(e.name, f.q)
+  );
+  const positions = [...new Set(DB.employees.map(e=>e.position))];
+
+  return `
+    <div class="page-header">
+      <div><h1 class="page-title">Funcionários</h1><p class="page-subtitle">Gestão de equipe por loja e shopping.</p></div>
+      <button class="btn btn-primary" id="addEmployeeBtn">${icon('plus')}Adicionar Funcionário</button>
+    </div>
+    <div class="table-card">
+      <div class="table-toolbar">
+        <div class="search-box">${icon('search')}<input id="employeeSearch" placeholder="Buscar funcionário..." value="${f.q}"></div>
+        <select class="select-filter" id="employeeMallFilter">
+          <option value="all">Todos os shoppings</option>
+          ${DB.malls.map(m=>`<option value="${m.id}" ${f.mall===m.id?'selected':''}>${m.name}</option>`).join('')}
+        </select>
+        <select class="select-filter" id="employeePositionFilter">
+          <option value="all">Todos os cargos</option>
+          ${positions.map(p=>`<option value="${p}" ${f.position===p?'selected':''}>${p}</option>`).join('')}
+        </select>
+      </div>
+      ${list.length===0 ? `<div class="empty-state">${icon('id-card')}<h3>Nenhum funcionário encontrado</h3><p>Ajuste sua busca ou filtros.</p></div>` : `
+      <div class="table-scroll"><table>
+        <thead><tr><th>Funcionário</th><th>Loja</th><th>Cargo</th><th>Shopping</th><th>Status</th><th>Início</th><th></th></tr></thead>
+        <tbody>
+          ${list.map(e=>`
+            <tr class="clickable" data-employee-open="${e.id}">
+              <td><div class="cell-with-avatar"><div class="mini-avatar">${initials(e.name)}</div><span class="cell-primary">${e.name}</span></div></td>
+              <td class="cell-muted">${storeById(e.storeId)?.name||'—'}</td>
+              <td>${e.position}</td>
+              <td class="cell-muted">${mallById(e.mallId)?.name}</td>
+              <td>${statusBadge(e.status)}</td>
+              <td class="cell-muted">${fmtDateBR(e.startDate)}</td>
+              <td><div class="row-actions"><button class="icon-btn btn-sm" data-employee-delete="${e.id}">${icon('trash-2')}</button></div></td>
+            </tr>`).join('')}
+        </tbody>
+      </table></div>
+      <div class="table-footer"><span>${list.length} de ${DB.employees.length} funcionários</span></div>`}
+    </div>
+  `;
+};
+
+VIEW_RENDERERS.employeeDetail = function(params){
+  const e = employeeById(params.employeeId);
+  if(!e) return emptyState('id-card','Funcionário não encontrado','Volte e selecione um funcionário válido.');
+  const store = storeById(e.storeId);
+  return `
+    <div class="detail-back" data-nav="employees">${icon('arrow-left')}Voltar para Funcionários</div>
+    <div class="detail-hero">
+      <div class="detail-hero-left">
+        <div class="detail-avatar">${initials(e.name)}</div>
+        <div>
+          <div class="detail-title">${e.name}</div>
+          <div class="detail-meta">
+            <span>${icon('briefcase')}${e.position}</span>
+            <span>${icon('store')}${store?.name}</span>
+            <span>${statusBadge(e.status)}</span>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-danger" data-employee-delete="${e.id}">${icon('trash-2')}Excluir</button>
+    </div>
+    <div class="card card-pad">
+      <div class="section-title" style="margin-bottom:14px">Informações de Emprego</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:18px;font-size:13px">
+        <div><div style="color:var(--text-muted);font-size:11.5px;margin-bottom:4px">Loja</div>${store?.name}</div>
+        <div><div style="color:var(--text-muted);font-size:11.5px;margin-bottom:4px">Shopping</div>${mallById(e.mallId)?.name}</div>
+        <div><div style="color:var(--text-muted);font-size:11.5px;margin-bottom:4px">Cargo</div>${e.position}</div>
+        <div><div style="color:var(--text-muted);font-size:11.5px;margin-bottom:4px">Telefone</div>${e.phone}</div>
+        <div><div style="color:var(--text-muted);font-size:11.5px;margin-bottom:4px">Data de Início</div>${fmtDateBR(e.startDate)}</div>
+        <div><div style="color:var(--text-muted);font-size:11.5px;margin-bottom:4px">Status</div>${statusBadge(e.status)}</div>
+      </div>
+    </div>
+  `;
+};
+/* ============================================================
+   PAGE: PARKING (operational dashboard)
+   ============================================================ */
+VIEW_RENDERERS.parking = function(params){
+  const mallId = (params&&params.mallId) || (state.selectedMall!=='all' ? state.selectedMall : 'm1');
+  const mall = mallById(mallId);
+  const sectors = DB.parkingSectors[mallId] || [];
+  const totalSpaces = sectors.reduce((s,x)=>s+x.spaces,0);
+  const occupiedSpaces = sectors.reduce((s,x)=>s+Math.round(x.spaces*x.occupied/100),0);
+  const available = totalSpaces-occupiedSpaces;
+  const pct = ((occupiedSpaces/totalSpaces)*100).toFixed(1);
+
+  return `
+    <div class="page-header">
+      <div><h1 class="page-title">Estacionamento</h1><p class="page-subtitle">Painel operacional de vagas em tempo real.</p></div>
+      <select class="select-filter" id="parkingMallSelect">
+        ${DB.malls.map(m=>`<option value="${m.id}" ${m.id===mallId?'selected':''}>${m.name}</option>`).join('')}
+      </select>
+    </div>
+
+    <div class="dash-grid-3">
+      <div class="kpi-card">
+        <div class="kpi-top"><div class="kpi-icon" style="background:var(--accent-2-soft);color:var(--accent-2)">${icon('square-parking')}</div></div>
+        <div class="kpi-label">Total de Vagas</div><div class="kpi-value num">${fmtNum(totalSpaces)}</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-top"><div class="kpi-icon" style="background:var(--warning-soft);color:var(--warning)">${icon('car')}</div></div>
+        <div class="kpi-label">Ocupadas</div><div class="kpi-value num">${fmtNum(occupiedSpaces)}</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-top"><div class="kpi-icon" style="background:var(--success-soft);color:var(--success)">${icon('circle-check')}</div></div>
+        <div class="kpi-label">Disponíveis</div><div class="kpi-value num">${fmtNum(available)}</div>
+      </div>
+    </div>
+
+    <div class="dash-grid">
+      <div class="card card-pad">
+        <div class="section-title" style="margin-bottom:4px">Ocupação Atual — ${mall?.name}</div>
+        <div class="section-desc" style="margin-bottom:18px">Percentual geral de vagas ocupadas</div>
+        <div style="display:flex;align-items:center;justify-content:center;padding:10px 0 6px">
+          <div style="position:relative;width:180px;height:180px">
+            <svg viewBox="0 0 120 120" style="width:100%;height:100%;transform:rotate(-90deg)">
+              <circle cx="60" cy="60" r="52" fill="none" stroke="var(--panel-3)" stroke-width="12"/>
+              <circle cx="60" cy="60" r="52" fill="none" stroke="var(--accent-2)" stroke-width="12" stroke-linecap="round"
+                stroke-dasharray="${2*Math.PI*52}" stroke-dashoffset="${2*Math.PI*52*(1-pct/100)}"/>
+            </svg>
+            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+              <div style="font-size:28px;font-weight:800;font-family:var(--font-display)" class="num">${pct}%</div>
+              <div style="font-size:11px;color:var(--text-muted)">ocupação</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div><div class="section-title">Ocupação ao Longo do Dia</div><div class="section-desc">Média horária de ocupação</div></div></div>
+        <div class="chart-wrap" style="height:220px"><canvas id="parkingChart"></canvas></div>
+      </div>
+    </div>
+
+    <div class="section-title" style="margin:20px 0 12px">Setores de Estacionamento</div>
+    <div class="kpi-grid">
+      ${sectors.map(sec=>{
+        const color = sec.occupied>=85 ? 'danger' : sec.occupied>=70 ? 'warning' : 'success';
+        return `
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <div class="kpi-icon" style="background:var(--${color}-soft);color:var(--${color})">${icon('square-parking')}</div>
+            <span class="badge badge-${color==='success'?'success':color==='warning'?'warning':'danger'}">${sec.occupied}%</span>
+          </div>
+          <div class="kpi-label">${sec.name}</div>
+          <div class="kpi-value num" style="font-size:19px;margin-bottom:10px">${fmtNum(sec.spaces)} vagas</div>
+          <div class="progress-track"><div class="progress-fill" style="width:${sec.occupied}%;background:var(--${color})"></div></div>
+        </div>`;
+      }).join('')}
+    </div>
+  `;
+};
+
+/* ============================================================
+   PAGE: REVIEWS
+   ============================================================ */
+VIEW_RENDERERS.reviews = function(){
+  const f = state.filters.reviews || (state.filters.reviews = { rating:'all', mall:'all', status:'all' });
+  const all = DB.reviews;
+  const dist = [5,4,3,2,1].map(r => ({ r, pct: Math.round((all.filter(x=>x.rating===r).length/all.length)*100) }));
+  const avg = (all.reduce((s,r)=>s+r.rating,0)/all.length).toFixed(1);
+  let list = all.filter(r => (f.rating==='all'||r.rating===+f.rating) && (f.mall==='all'||r.mallId===f.mall) && (f.status==='all'||r.status===f.status));
+
+  return `
+    <div class="page-header">
+      <div><h1 class="page-title">Avaliações</h1><p class="page-subtitle">Gestão de avaliações e feedback dos clientes.</p></div>
+    </div>
+
+    <div class="dash-grid" style="grid-template-columns:320px 1fr">
+      <div class="card card-pad">
+        <div class="section-title" style="margin-bottom:2px">Avaliação Geral</div>
+        <div style="display:flex;align-items:baseline;gap:8px;margin:10px 0 16px">
+          <div style="font-size:36px;font-weight:800;font-family:var(--font-display)" class="num">${avg}</div>
+          <div style="color:var(--text-muted);font-size:13px">/ 5.0</div>
+        </div>
+        ${starRow(Math.round(avg))}
+        <div style="margin-top:18px">
+          ${dist.map(d=>`
+            <div class="rating-bar-row">
+              <span class="lbl">${d.r} ★</span>
+              <div class="progress-track"><div class="progress-fill" style="width:${d.pct}%"></div></div>
+              <span class="pct">${d.pct}%</span>
+            </div>`).join('')}
+        </div>
+      </div>
+      <div class="card">
+        <div class="table-toolbar" style="border-bottom:1px solid var(--border-soft)">
+          <select class="select-filter" id="reviewRatingFilter">
+            <option value="all">Todas as notas</option>
+            ${[5,4,3,2,1].map(r=>`<option value="${r}" ${f.rating==r?'selected':''}>${r} estrelas</option>`).join('')}
+          </select>
+          <select class="select-filter" id="reviewMallFilter">
+            <option value="all">Todos os shoppings</option>
+            ${DB.malls.map(m=>`<option value="${m.id}" ${f.mall===m.id?'selected':''}>${m.name}</option>`).join('')}
+          </select>
+          <select class="select-filter" id="reviewStatusFilter">
+            <option value="all">Todos os status</option>
+            <option value="Published" ${f.status==='Published'?'selected':''}>Publicada</option>
+            <option value="Pending" ${f.status==='Pending'?'selected':''}>Pendente</option>
+            <option value="Flagged" ${f.status==='Flagged'?'selected':''}>Sinalizada</option>
+          </select>
+        </div>
+        <div style="padding:14px 18px;max-height:520px;overflow-y:auto">
+          ${list.length===0 ? emptyStateInline('star','Nenhuma avaliação encontrada','Ajuste os filtros para ver resultados.') :
+            list.map(r=>`
+              <div class="review-card" data-review-id="${r.id}">
+                <div class="review-top">
+                  <div><div class="cell-primary">${customerById(r.customerId)?.name}</div>${starRow(r.rating)}</div>
+                  <div style="display:flex;gap:6px">${statusBadge(r.status)}
+                    <button class="icon-btn btn-sm" data-review-delete="${r.id}">${icon('trash-2')}</button>
+                  </div>
+                </div>
+                <p class="review-comment">${r.comment}</p>
+                <div class="review-foot"><span>${mallById(r.mallId)?.name}</span><span>${fmtDateBR(r.date)}</span></div>
+              </div>`).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+};
+function emptyStateInline(iconName,title,desc){
+  return `<div class="empty-state">${icon(iconName)}<h3>${title}</h3><p>${desc}</p></div>`;
+}
+
+/* ============================================================
+   PAGE: CONTRACTS
+   ============================================================ */
+VIEW_RENDERERS.contracts = function(){
+  const f = state.filters.contracts || (state.filters.contracts = { q:'', status:'all' });
+  const all = DB.contracts;
+  const active = all.filter(c=>c.status==='Active').length;
+  const expiring = all.filter(c=>c.status==='Expiring Soon').length;
+  const expired = all.filter(c=>c.status==='Expired'||c.status==='Suspended').length;
+  const monthlyValue = all.filter(c=>c.status==='Active'||c.status==='Expiring Soon').reduce((s,c)=>s+c.value,0);
+  let list = all.filter(c => (f.status==='all'||c.status===f.status) && matchSearch(storeById(c.storeId)?.name||'', f.q));
+
+  return `
+    <div class="page-header">
+      <div><h1 class="page-title">Contratos</h1><p class="page-subtitle">Gestão de contratos de arrendamento e parcerias.</p></div>
+      <button class="btn btn-primary" id="addContractBtn">${icon('plus')}Novo Contrato</button>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="kpi-top"><div class="kpi-icon" style="background:var(--success-soft);color:var(--success)">${icon('file-check-2')}</div></div><div class="kpi-label">Contratos Ativos</div><div class="kpi-value num">${active}</div></div>
+      <div class="kpi-card"><div class="kpi-top"><div class="kpi-icon" style="background:var(--warning-soft);color:var(--warning)">${icon('clock-alert')}</div></div><div class="kpi-label">Expirando em Breve</div><div class="kpi-value num">${expiring}</div></div>
+      <div class="kpi-card"><div class="kpi-top"><div class="kpi-icon" style="background:var(--accent-soft);color:var(--accent)">${icon('circle-dollar-sign')}</div></div><div class="kpi-label">Valor Mensal Total</div><div class="kpi-value num">${fmtBRL(monthlyValue)}</div></div>
+      <div class="kpi-card"><div class="kpi-top"><div class="kpi-icon" style="background:var(--danger-soft);color:var(--danger)">${icon('file-x-2')}</div></div><div class="kpi-label">Expirados/Suspensos</div><div class="kpi-value num">${expired}</div></div>
+    </div>
+
+    <div class="table-card">
+      <div class="table-toolbar">
+        <div class="search-box">${icon('search')}<input id="contractSearch" placeholder="Buscar por loja..." value="${f.q}"></div>
+        <select class="select-filter" id="contractStatusFilter">
+          <option value="all">Todos os status</option>
+          <option value="Active" ${f.status==='Active'?'selected':''}>Ativo</option>
+          <option value="Expiring Soon" ${f.status==='Expiring Soon'?'selected':''}>Expirando</option>
+          <option value="Expired" ${f.status==='Expired'?'selected':''}>Expirado</option>
+          <option value="Suspended" ${f.status==='Suspended'?'selected':''}>Suspenso</option>
+        </select>
+      </div>
+      ${list.length===0 ? `<div class="empty-state">${icon('file-signature')}<h3>Nenhum contrato encontrado</h3><p>Ajuste sua busca ou filtros.</p></div>` : `
+      <div class="table-scroll"><table>
+        <thead><tr><th>Loja</th><th>Shopping</th><th>Início</th><th>Término</th><th>Valor Mensal</th><th>Status</th><th></th></tr></thead>
+        <tbody>
+          ${list.map(c=>`
+            <tr class="clickable" data-contract-open="${c.id}">
+              <td class="cell-primary">${storeById(c.storeId)?.name||'—'}</td>
+              <td class="cell-muted">${mallById(c.mallId)?.name}</td>
+              <td class="cell-muted">${fmtDateBR(c.start)}</td>
+              <td class="cell-muted">${fmtDateBR(c.end)}</td>
+              <td class="num">${fmtBRL(c.value)}</td>
+              <td>${statusBadge(c.status)}</td>
+              <td><div class="row-actions"><button class="icon-btn btn-sm" data-contract-delete="${c.id}">${icon('trash-2')}</button></div></td>
+            </tr>`).join('')}
+        </tbody>
+      </table></div>
+      <div class="table-footer"><span>${list.length} de ${all.length} contratos</span></div>`}
+    </div>
+  `;
+};
+
+function openContractDetail(id){
+  const c = contractById(id);
+  if(!c) return;
+  const store = storeById(c.storeId);
+  openModal(`
+    <div class="modal-head"><div class="modal-title">Contrato — ${store?.name}</div><button class="modal-close" onclick="closeModal()">${icon('x')}</button></div>
+    <div class="modal-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;font-size:13px;margin-bottom:16px">
+        <div><div style="color:var(--text-muted);font-size:11.5px;margin-bottom:4px">Shopping</div>${mallById(c.mallId)?.name}</div>
+        <div><div style="color:var(--text-muted);font-size:11.5px;margin-bottom:4px">Status</div>${statusBadge(c.status)}</div>
+        <div><div style="color:var(--text-muted);font-size:11.5px;margin-bottom:4px">Início</div>${fmtDateBR(c.start)}</div>
+        <div><div style="color:var(--text-muted);font-size:11.5px;margin-bottom:4px">Término</div>${fmtDateBR(c.end)}</div>
+        <div><div style="color:var(--text-muted);font-size:11.5px;margin-bottom:4px">Valor Mensal</div>${fmtBRL(c.value)}</div>
+      </div>
+    </div>
+    <div class="modal-foot"><button class="btn btn-secondary" onclick="closeModal()">Fechar</button></div>
+  `);
+}
+/* ============================================================
+   PAGE: ANALYTICS
+   ============================================================ */
+VIEW_RENDERERS.analytics = function(){
+  const topStores = [...DB.stores].sort((a,b)=>b.revenue-a.revenue).slice(0,6);
+  const catPerf = CATS.map(c=>{
+    const stores = DB.stores.filter(s=>s.category===c);
+    const rev = stores.reduce((s,x)=>s+x.revenue,0);
+    return { cat:c, rev, count:stores.length };
+  }).sort((a,b)=>b.rev-a.rev);
+  const maxCatRev = Math.max(...catPerf.map(c=>c.rev),1);
+
+  return `
+    <div class="page-header">
+      <div><h1 class="page-title">Analytics</h1><p class="page-subtitle">Inteligência de negócios sobre performance da rede.</p></div>
+      <div class="chip-row">
+        <div class="chip active">12 meses</div><div class="chip">Trimestre</div><div class="chip">Mês</div>
+      </div>
+    </div>
+
+    <div class="dash-grid">
+      <div class="card">
+        <div class="card-head"><div><div class="section-title">Receita por Shopping</div><div class="section-desc">Comparativo mensal atual</div></div></div>
+        <div class="chart-wrap" style="height:250px"><canvas id="anRevenueChart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div><div class="section-title">Satisfação por Shopping</div><div class="section-desc">Nota média de avaliações</div></div></div>
+        <div class="chart-wrap" style="height:250px"><canvas id="anSatisfactionChart"></canvas></div>
+      </div>
+    </div>
+
+    <div class="dash-grid" style="grid-template-columns:1fr 1fr">
+      <div class="card card-pad">
+        <div class="section-title" style="margin-bottom:14px">Performance por Categoria</div>
+        ${catPerf.map(c=>`
+          <div class="rating-bar-row">
+            <span class="lbl" style="width:110px">${CAT_LABEL_PT[c.cat]}</span>
+            <div class="progress-track"><div class="progress-fill" style="width:${(c.rev/maxCatRev)*100}%;background:var(--accent-2)"></div></div>
+            <span class="pct" style="width:80px;text-align:right">${fmtBRL(c.rev)}</span>
+          </div>
+        `).join('')}
+      </div>
+      <div class="card card-pad">
+        <div class="section-title" style="margin-bottom:6px">Top Lojas por Performance</div>
+        ${topStores.map((s,i)=>`
+          <div class="perf-row">
+            <div class="perf-rank">${i+1}</div>
+            <div class="mini-avatar">${initials(s.name)}</div>
+            <div style="flex:1">
+              <div class="perf-name">${s.name}</div>
+              <div class="perf-sub">${mallById(s.mallId)?.name} · ${CAT_LABEL_PT[s.category]}</div>
+            </div>
+            <div class="perf-val num">${fmtBRL(s.revenue)}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="dash-grid-3">
+      <div class="kpi-card">
+        <div class="kpi-label">Ocupação Média da Rede</div>
+        <div class="kpi-value num">${(DB.malls.reduce((s,m)=>s+m.occupancy,0)/DB.malls.length).toFixed(1)}%</div>
+        <div class="kpi-trend"><span class="trend-up">${icon('trending-up')}+2.1%</span><span class="kpi-trend-label">vs. trimestre anterior</span></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Ocupação Média de Vagas</div>
+        <div class="kpi-value num">${((DB.malls.reduce((s,m)=>s+m.parkingOccupied,0)/DB.malls.reduce((s,m)=>s+m.parkingTotal,0))*100).toFixed(1)}%</div>
+        <div class="kpi-trend"><span class="trend-down">${icon('trending-down')}-1.4%</span><span class="kpi-trend-label">vs. trimestre anterior</span></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Satisfação Média da Rede</div>
+        <div class="kpi-value num">${(DB.malls.reduce((s,m)=>s+m.satisfaction,0)/DB.malls.length).toFixed(2)} / 5</div>
+        <div class="kpi-trend"><span class="trend-up">${icon('trending-up')}+0.2</span><span class="kpi-trend-label">vs. trimestre anterior</span></div>
+      </div>
+    </div>
+  `;
+};
+
+/* ============================================================
+   PAGE: SETTINGS
+   ============================================================ */
+VIEW_RENDERERS.settings = function(){
+  const tab = state.params.tab || 'general';
+  const tabs = [
+    {id:'general', label:'Geral', icon:'settings'},
+    {id:'profile', label:'Perfil', icon:'user'},
+    {id:'notifications', label:'Notificações', icon:'bell'},
+    {id:'appearance', label:'Aparência', icon:'palette'},
+    {id:'security', label:'Segurança', icon:'shield'},
+  ];
+  return `
+    <div class="page-header"><div><h1 class="page-title">Configurações</h1><p class="page-subtitle">Gerencie as preferências da sua conta e do sistema.</p></div></div>
+    <div class="settings-grid">
+      <div class="settings-nav">
+        ${tabs.map(t=>`<div class="nav-item ${tab===t.id?'active':''}" data-settings-tab="${t.id}">${icon(t.icon)}<span>${t.label}</span></div>`).join('')}
+      </div>
+      <div class="card card-pad">
+        ${settingsTabContent(tab)}
+      </div>
+    </div>
+  `;
+};
+
+function settingsTabContent(tab){
+  if(tab==='general') return `
+    <div class="settings-section">
+      <div class="section-title" style="margin-bottom:14px">Preferências Gerais</div>
+      <div class="form-group"><label class="form-label">Nome da Empresa</label><input class="form-input" value="Mallverse Rede de Shoppings"></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Fuso Horário</label><select class="form-select"><option>América/São_Paulo (GMT-3)</option></select></div>
+        <div class="form-group"><label class="form-label">Idioma</label><select class="form-select"><option>Português (Brasil)</option><option>English</option></select></div>
+      </div>
+    </div>
+    <div class="settings-section">
+      <div class="settings-row"><div><div class="settings-row-label">Moeda Padrão</div><div class="settings-row-desc">Usada em relatórios e painéis financeiros</div></div><select class="form-select" style="width:120px"><option>R$ BRL</option></select></div>
+      <div class="settings-row"><div><div class="settings-row-label">Formato de Data</div><div class="settings-row-desc">Como as datas são exibidas no sistema</div></div><select class="form-select" style="width:140px"><option>DD/MM/AAAA</option></select></div>
+    </div>
+  `;
+  if(tab==='profile') return `
+    <div class="settings-section">
+      <div class="section-title" style="margin-bottom:14px">Informações do Perfil</div>
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px">
+        <div class="avatar" style="width:56px;height:56px;font-size:16px">AD</div>
+        <div><button class="btn btn-secondary btn-sm">Alterar foto</button></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Nome Completo</label><input class="form-input" value="Admin Mallverse"></div>
+        <div class="form-group"><label class="form-label">Cargo</label><input class="form-input" value="Administrador da Rede"></div>
+      </div>
+      <div class="form-group"><label class="form-label">E-mail</label><input class="form-input" value="admin@mallverse.com.br"></div>
+    </div>
+  `;
+  if(tab==='notifications') return `
+    <div class="settings-section">
+      <div class="section-title" style="margin-bottom:6px">Preferências de Notificação</div>
+      <div class="settings-row"><div><div class="settings-row-label">Contratos expirando</div><div class="settings-row-desc">Avisar 30 dias antes do vencimento</div></div><div class="toggle on" data-toggle></div></div>
+      <div class="settings-row"><div><div class="settings-row-label">Novas avaliações</div><div class="settings-row-desc">Notificar sobre avaliações recebidas</div></div><div class="toggle on" data-toggle></div></div>
+      <div class="settings-row"><div><div class="settings-row-label">Ocupação de estacionamento</div><div class="settings-row-desc">Alertar quando um setor atingir 90%</div></div><div class="toggle" data-toggle></div></div>
+      <div class="settings-row"><div><div class="settings-row-label">Relatório semanal por e-mail</div><div class="settings-row-desc">Resumo de desempenho toda segunda-feira</div></div><div class="toggle on" data-toggle></div></div>
+    </div>
+  `;
+  if(tab==='appearance') return `
+    <div class="settings-section">
+      <div class="section-title" style="margin-bottom:14px">Tema</div>
+      <div class="theme-swatches">
+        <div class="theme-swatch ${state.theme==='dark'?'active':''}" data-theme-set="dark"><div class="theme-swatch-preview" style="background:#0A0F1C;border:1px solid #232E4A"></div>Escuro</div>
+        <div class="theme-swatch ${state.theme==='light'?'active':''}" data-theme-set="light"><div class="theme-swatch-preview" style="background:#F3F4F9;border:1px solid #E2E5F0"></div>Claro</div>
+      </div>
+    </div>
+    <div class="settings-section">
+      <div class="settings-row"><div><div class="settings-row-label">Sidebar recolhida por padrão</div><div class="settings-row-desc">Iniciar sempre com o menu compacto</div></div><div class="toggle ${state.sidebarCollapsed?'on':''}" id="sidebarDefaultToggle" data-toggle></div></div>
+      <div class="settings-row"><div><div class="settings-row-label">Animações reduzidas</div><div class="settings-row-desc">Diminuir transições e efeitos visuais</div></div><div class="toggle" data-toggle></div></div>
+    </div>
+  `;
+  if(tab==='security') return `
+    <div class="settings-section">
+      <div class="section-title" style="margin-bottom:14px">Segurança da Conta</div>
+      <div class="form-group"><label class="form-label">Senha Atual</label><input type="password" class="form-input" placeholder="••••••••"></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Nova Senha</label><input type="password" class="form-input" placeholder="••••••••"></div>
+        <div class="form-group"><label class="form-label">Confirmar Senha</label><input type="password" class="form-input" placeholder="••••••••"></div>
+      </div>
+      <button class="btn btn-primary btn-sm">Atualizar senha</button>
+    </div>
+    <div class="settings-section">
+      <div class="settings-row"><div><div class="settings-row-label">Autenticação de dois fatores</div><div class="settings-row-desc">Adicione uma camada extra de segurança</div></div><div class="toggle" data-toggle></div></div>
+    </div>
+  `;
+  return '';
+}
+/* ============================================================
+   MODALS: FORMS
+   ============================================================ */
+
+function openMallForm(existing){
+  const isEdit = !!existing;
+  openModal(`
+    <div class="modal-head"><div class="modal-title">${isEdit?'Editar Shopping':'Adicionar Shopping'}</div><button class="modal-close" onclick="closeModal()">${icon('x')}</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Nome do Shopping</label><input class="form-input" id="f_name" value="${existing?.name||''}" placeholder="Ex: Mall Atlântico"></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Cidade</label><input class="form-input" id="f_city" value="${existing?.city||''}" placeholder="Ex: São Paulo"></div>
+        <div class="form-group"><label class="form-label">Estado</label><input class="form-input" id="f_state" value="${existing?.state||''}" placeholder="Ex: SP" maxlength="2"></div>
+      </div>
+      <div class="form-group"><label class="form-label">CNPJ</label><input class="form-input" id="f_cnpj" value="${existing?.cnpj||''}" placeholder="00.000.000/0001-00"></div>
+      <div class="form-group"><label class="form-label">Status</label>
+        <select class="form-select" id="f_status">
+          <option value="Active" ${existing?.status==='Active'?'selected':''}>Ativo</option>
+          <option value="Maintenance" ${existing?.status==='Maintenance'?'selected':''}>Manutenção</option>
+          <option value="Inactive" ${existing?.status==='Inactive'?'selected':''}>Inativo</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" id="saveMallBtn">${isEdit?'Salvar Alterações':'Criar Shopping'}</button>
+    </div>
+  `, 'md');
+  document.getElementById('saveMallBtn').addEventListener('click', ()=>{
+    const name = document.getElementById('f_name').value.trim();
+    if(!name){ toast('Informe o nome do shopping.', 'danger'); return; }
+    const payload = {
+      name, city: document.getElementById('f_city').value.trim(), state: document.getElementById('f_state').value.trim().toUpperCase(),
+      cnpj: document.getElementById('f_cnpj').value.trim(), status: document.getElementById('f_status').value,
+    };
+    if(isEdit){ Object.assign(existing, payload); toast('Shopping atualizado com sucesso.'); }
+    else {
+      DB.malls.push({ id: nextId('m', DB.malls), stores:0, occupancy:0, parkingTotal:1000, parkingOccupied:0, revenue:0, satisfaction:0, updated: new Date().toISOString().slice(0,10), ...payload });
+      toast('Shopping criado com sucesso.');
+    }
+    closeModal(); render();
+  });
+}
+
+function openStoreForm(existing){
+  const isEdit = !!existing;
+  openModal(`
+    <div class="modal-head"><div class="modal-title">${isEdit?'Editar Loja':'Adicionar Loja'}</div><button class="modal-close" onclick="closeModal()">${icon('x')}</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Nome da Loja</label><input class="form-input" id="f_name" value="${existing?.name||''}" placeholder="Ex: Aurora Fashion"></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Shopping</label><select class="form-select" id="f_mall">${DB.malls.map(m=>`<option value="${m.id}" ${existing?.mallId===m.id?'selected':''}>${m.name}</option>`).join('')}</select></div>
+        <div class="form-group"><label class="form-label">Unidade</label><input class="form-input" id="f_unit" value="${existing?.unit||''}" placeholder="Ex: L-102"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Categoria</label><select class="form-select" id="f_cat">${CATS.map(c=>`<option value="${c}" ${existing?.category===c?'selected':''}>${CAT_LABEL_PT[c]}</option>`).join('')}</select></div>
+        <div class="form-group"><label class="form-label">Status</label>
+          <select class="form-select" id="f_status">
+            <option value="Active" ${existing?.status==='Active'?'selected':''}>Ativo</option>
+            <option value="Maintenance" ${existing?.status==='Maintenance'?'selected':''}>Manutenção</option>
+            <option value="Inactive" ${existing?.status==='Inactive'?'selected':''}>Inativo</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group"><label class="form-label">Gerente</label><input class="form-input" id="f_manager" value="${existing?.manager||''}" placeholder="Nome do gerente"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" id="saveStoreBtn">${isEdit?'Salvar Alterações':'Criar Loja'}</button>
+    </div>
+  `, 'md');
+  document.getElementById('saveStoreBtn').addEventListener('click', ()=>{
+    const name = document.getElementById('f_name').value.trim();
+    if(!name){ toast('Informe o nome da loja.', 'danger'); return; }
+    const payload = {
+      name, mallId: document.getElementById('f_mall').value, unit: document.getElementById('f_unit').value.trim(),
+      category: document.getElementById('f_cat').value, status: document.getElementById('f_status').value,
+      manager: document.getElementById('f_manager').value.trim(),
+    };
+    if(isEdit){ Object.assign(existing, payload); toast('Loja atualizada com sucesso.'); }
+    else { DB.stores.push({ id: nextId('s', DB.stores), revenue:0, contractId:null, ...payload }); toast('Loja criada com sucesso.'); }
+    closeModal(); render();
+  });
+}
+
+function openCustomerForm(){
+  openModal(`
+    <div class="modal-head"><div class="modal-title">Adicionar Cliente</div><button class="modal-close" onclick="closeModal()">${icon('x')}</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Nome Completo</label><input class="form-input" id="f_name" placeholder="Ex: João Pedro Oliveira"></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">CPF</label><input class="form-input" id="f_cpf" placeholder="000.000.000-00"></div>
+        <div class="form-group"><label class="form-label">Telefone</label><input class="form-input" id="f_phone" placeholder="(11) 99999-9999"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Shopping Favorito</label><select class="form-select" id="f_mall">${DB.malls.map(m=>`<option value="${m.id}">${m.name}</option>`).join('')}</select></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" id="saveCustomerBtn">Criar Cliente</button>
+    </div>
+  `, 'md');
+  document.getElementById('saveCustomerBtn').addEventListener('click', ()=>{
+    const name = document.getElementById('f_name').value.trim();
+    if(!name){ toast('Informe o nome do cliente.', 'danger'); return; }
+    DB.customers.push({
+      id: nextId('cu', DB.customers), name, cpf: document.getElementById('f_cpf').value.trim()||'—',
+      phone: document.getElementById('f_phone').value.trim()||'—', mallId: document.getElementById('f_mall').value,
+      reviews:0, satisfaction:0, lastInteraction: new Date().toISOString().slice(0,10), status:'Active',
+    });
+    toast('Cliente criado com sucesso.'); closeModal(); render();
+  });
+}
+
+function openEmployeeForm(prefillStoreId){
+  openModal(`
+    <div class="modal-head"><div class="modal-title">Adicionar Funcionário</div><button class="modal-close" onclick="closeModal()">${icon('x')}</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Nome Completo</label><input class="form-input" id="f_name" placeholder="Ex: Bruno Cardoso"></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Loja</label><select class="form-select" id="f_store">${DB.stores.map(s=>`<option value="${s.id}" ${prefillStoreId===s.id?'selected':''}>${s.name}</option>`).join('')}</select></div>
+        <div class="form-group"><label class="form-label">Cargo</label><select class="form-select" id="f_position"><option>Gerente de Loja</option><option>Vendedor</option><option>Caixa</option><option>Estoquista</option></select></div>
+      </div>
+      <div class="form-group"><label class="form-label">Telefone</label><input class="form-input" id="f_phone" placeholder="(11) 99999-9999"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" id="saveEmployeeBtn">Criar Funcionário</button>
+    </div>
+  `, 'md');
+  document.getElementById('saveEmployeeBtn').addEventListener('click', ()=>{
+    const name = document.getElementById('f_name').value.trim();
+    if(!name){ toast('Informe o nome do funcionário.', 'danger'); return; }
+    const storeId = document.getElementById('f_store').value;
+    const store = storeById(storeId);
+    DB.employees.push({
+      id: nextId('e', DB.employees), name, storeId, mallId: store?.mallId,
+      position: document.getElementById('f_position').value, status:'Active',
+      startDate: new Date().toISOString().slice(0,10), phone: document.getElementById('f_phone').value.trim()||'—',
+    });
+    toast('Funcionário criado com sucesso.'); closeModal(); render();
+  });
+}
+
+function openContractForm(){
+  openModal(`
+    <div class="modal-head"><div class="modal-title">Novo Contrato</div><button class="modal-close" onclick="closeModal()">${icon('x')}</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Loja</label><select class="form-select" id="f_store">${DB.stores.map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</select></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Data de Início</label><input type="date" class="form-input" id="f_start" value="${new Date().toISOString().slice(0,10)}"></div>
+        <div class="form-group"><label class="form-label">Data de Término</label><input type="date" class="form-input" id="f_end"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Valor Mensal (R$)</label><input type="number" class="form-input" id="f_value" placeholder="8500"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" id="saveContractBtn">Criar Contrato</button>
+    </div>
+  `, 'md');
+  document.getElementById('saveContractBtn').addEventListener('click', ()=>{
+    const storeId = document.getElementById('f_store').value;
+    const store = storeById(storeId);
+    const value = parseFloat(document.getElementById('f_value').value)||0;
+    if(!document.getElementById('f_end').value){ toast('Informe a data de término.', 'danger'); return; }
+    DB.contracts.push({
+      id: nextId('c', DB.contracts), storeId, mallId: store?.mallId,
+      start: document.getElementById('f_start').value, end: document.getElementById('f_end').value,
+      value, status:'Active',
+    });
+    toast('Contrato criado com sucesso.'); closeModal(); render();
+  });
+}
+
+function deleteRecord(arrName, id, label){
+  confirmModal(`Excluir ${label}?`, `Esta ação não pode ser desfeita. Tem certeza de que deseja excluir permanentemente este registro?`, ()=>{
+    const arr = DB[arrName];
+    const idx = arr.findIndex(x=>x.id===id);
+    if(idx>-1) arr.splice(idx,1);
+    toast(`${label} excluído(a) com sucesso.`, 'danger');
+    if(state.view.endsWith('Detail')) navigate(arrName);
+    else render();
+  }, 'Excluir');
+}
+/* ============================================================
+   VIEW-SPECIFIC POST-RENDER HOOKS (charts, table sort state)
+   ============================================================ */
+function attachViewHandlers(view, params){
+  if(view==='dashboard'){ buildRevenueChart(); buildCategoryDonut(); buildOccupancyChart(); }
+  if(view==='parking'){ buildParkingChart(); }
+  if(view==='analytics'){ buildAnalyticsRevenueChart(); buildAnalyticsSatisfactionChart(); }
+
+  // restore focus to active filter input after a re-render triggered by typing
+  if(state._focusId){
+    const el = document.getElementById(state._focusId);
+    if(el){ el.focus(); const v=el.value; el.value=''; el.value=v; }
+    state._focusId = null;
+  }
+}
+
+function setFilter(page, key, value, focusId){
+  const f = state.filters[page] || (state.filters[page] = {});
+  f[key] = value;
+  state._focusId = focusId || null;
+  render();
+}
+
+/* ============================================================
+   GLOBAL EVENT DELEGATION (attached once)
+   ============================================================ */
+function initDelegation(){
+  const root = document.getElementById('view-root');
+
+  root.addEventListener('click', e=>{
+    const t = e.target;
+
+    // ---- action buttons first (they may be nested inside clickable rows/cards,
+    // so these must be resolved before the generic "open" handlers below) ----
+
+    // ---- add buttons ----
+    if(t.closest('#addMallBtn')){ openMallForm(); return; }
+    if(t.closest('#addStoreBtn')){ openStoreForm(); return; }
+    if(t.closest('#addStoreFromMallBtn')){ const m = mallById(state.params.mallId); openStoreForm(null); if(m) setTimeout(()=>{ const sel=document.getElementById('f_mall'); if(sel) sel.value=m.id; },0); return; }
+    if(t.closest('#addCustomerBtn')){ openCustomerForm(); return; }
+    if(t.closest('#addEmployeeBtn')){ openEmployeeForm(); return; }
+    if(t.closest('#addEmployeeFromStoreBtn')){ openEmployeeForm(state.params.storeId); return; }
+    if(t.closest('#addContractBtn')){ openContractForm(); return; }
+    if(t.closest('#editMallBtn')){ openMallForm(mallById(state.params.mallId)); return; }
+    if(t.closest('#exportBtn')){ toast('Relatório exportado com sucesso.', 'info'); return; }
+
+    // ---- edit ----
+    const storeEdit = t.closest('[data-store-edit]');
+    if(storeEdit){ openStoreForm(storeById(storeEdit.dataset.storeEdit)); return; }
+
+    // ---- delete ----
+    const storeDel = t.closest('[data-store-delete]');
+    if(storeDel){ deleteRecord('stores', storeDel.dataset.storeDelete, 'Loja'); return; }
+    const custDel = t.closest('[data-customer-delete]');
+    if(custDel){ deleteRecord('customers', custDel.dataset.customerDelete, 'Cliente'); return; }
+    const empDel = t.closest('[data-employee-delete]');
+    if(empDel){ deleteRecord('employees', empDel.dataset.employeeDelete, 'Funcionário'); return; }
+    const contractDel = t.closest('[data-contract-delete]');
+    if(contractDel){ deleteRecord('contracts', contractDel.dataset.contractDelete, 'Contrato'); return; }
+    const reviewDel = t.closest('[data-review-delete]');
+    if(reviewDel){ deleteRecord('reviews', reviewDel.dataset.reviewDelete, 'Avaliação'); return; }
+
+    // table sort headers
+    const sortTh = t.closest('[data-sort]');
+    if(sortTh){
+      const f = state.filters.stores;
+      if(f){
+        if(f.sort === sortTh.dataset.sort) f.dir *= -1; else { f.sort = sortTh.dataset.sort; f.dir = 1; }
+        render();
+      }
+      return;
+    }
+
+    // store detail tabs
+    const storeTab = t.closest('[data-store-tab]');
+    if(storeTab){ navigate('storeDetail', { storeId: state.params.storeId, tab: storeTab.dataset.storeTab }); return; }
+
+    // settings tabs
+    const settingsTab = t.closest('[data-settings-tab]');
+    if(settingsTab){ navigate('settings', { tab: settingsTab.dataset.settingsTab }); return; }
+
+    // theme swatches in settings
+    const themeSet = t.closest('[data-theme-set]');
+    if(themeSet){
+      const want = themeSet.dataset.themeSet;
+      if(want !== state.theme) toggleTheme();
+      render(); return;
+    }
+
+    // toggles
+    const toggle = t.closest('[data-toggle]');
+    if(toggle){ toggle.classList.toggle('on'); return; }
+
+    // ---- generic "open" handlers (row/card is clickable as a whole) ----
+
+    // generic nav buttons inside content
+    const navEl = t.closest('[data-nav]');
+    if(navEl && navEl.closest('#view-root')){
+      const p = navEl.dataset.navParams ? JSON.parse(navEl.dataset.navParams) : {};
+      navigate(navEl.dataset.nav, p); return;
+    }
+
+    // mall card open
+    const mallOpen = t.closest('[data-mall-open]');
+    if(mallOpen){ navigate('mallDetail', { mallId: mallOpen.dataset.mallOpen }); return; }
+
+    // store open
+    const storeOpen = t.closest('[data-store-open]');
+    if(storeOpen){ navigate('storeDetail', { storeId: storeOpen.dataset.storeOpen }); return; }
+
+    // customer open
+    const custOpen = t.closest('[data-customer-open]');
+    if(custOpen){ navigate('customerDetail', { customerId: custOpen.dataset.customerOpen }); return; }
+
+    // employee open
+    const empOpen = t.closest('[data-employee-open]');
+    if(empOpen){ navigate('employeeDetail', { employeeId: empOpen.dataset.employeeOpen }); return; }
+
+    // contract open (modal)
+    const contractOpen = t.closest('[data-contract-open]');
+    if(contractOpen){ openContractDetail(contractOpen.dataset.contractOpen); return; }
+  });
+
+  root.addEventListener('input', e=>{
+    const id = e.target.id;
+    const v = e.target.value;
+    const map = {
+      mallSearch: ['malls','q'], storeSearch: ['stores','q'], customerSearch: ['customers','q'],
+      employeeSearch: ['employees','q'], contractSearch: ['contracts','q'],
+    };
+    if(map[id]){ setFilter(map[id][0], map[id][1], v, id); }
+  });
+
+  root.addEventListener('change', e=>{
+    const id = e.target.id;
+    const v = e.target.value;
+    const map = {
+      mallStatusFilter: ['malls','status'], storeMallFilter: ['stores','mall'], storeCatFilter: ['stores','category'],
+      storeStatusFilter: ['stores','status'], customerStatusFilter: ['customers','status'],
+      employeeMallFilter: ['employees','mall'], employeePositionFilter: ['employees','position'],
+      reviewRatingFilter: ['reviews','rating'], reviewMallFilter: ['reviews','mall'], reviewStatusFilter: ['reviews','status'],
+      contractStatusFilter: ['contracts','status'],
+    };
+    if(map[id]){ setFilter(map[id][0], map[id][1], v); return; }
+    if(id==='parkingMallSelect'){ navigate('parking', { mallId: v }); return; }
+  });
+
+  // keyboard: escape closes modal
+  document.addEventListener('keydown', e=>{
+    if(e.key==='Escape') closeModal();
+  });
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+document.addEventListener('DOMContentLoaded', ()=>{
+  initDelegation();
+  render();
+});
+
+</script>
+</body>
+</html>
