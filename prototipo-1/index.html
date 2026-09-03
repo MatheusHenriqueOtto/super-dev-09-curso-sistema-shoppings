@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0d1726" />
+  <title>Mallverse — Shopping Network Intelligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand"><div class="brand-mark">M</div><div><strong>MALLVERSE</strong><span>Network intelligence</span></div><button class="icon-btn sidebar-close" id="closeSidebar" aria-label="Fechar menu">×</button></div>
+      <div class="workspace-switcher"><span class="workspace-dot"></span><div><small>Workspace</small><b>Grupo Horizonte</b></div><span class="chevron">⌄</span></div>
+      <nav class="nav"><div class="nav-label">OVERVIEW</div><button class="nav-item active" data-page="dashboard"><span class="nav-icon">⌂</span>Dashboard</button><div class="nav-label">MANAGEMENT</div><button class="nav-item" data-page="malls"><span class="nav-icon">▦</span>Shopping malls</button><button class="nav-item" data-page="stores"><span class="nav-icon">⌑</span>Stores</button><button class="nav-item" data-page="customers"><span class="nav-icon">♙</span>Customers</button><button class="nav-item" data-page="employees"><span class="nav-icon">♧</span>Employees</button><button class="nav-item" data-page="parking"><span class="nav-icon">⌖</span>Parking</button><button class="nav-item" data-page="reviews"><span class="nav-icon">☆</span>Reviews <em class="nav-count">12</em></button><button class="nav-item" data-page="contracts"><span class="nav-icon">▤</span>Contracts <em class="nav-count warning">8</em></button><div class="nav-label">INSIGHTS</div><button class="nav-item" data-page="analytics"><span class="nav-icon">◒</span>Analytics</button><div class="nav-label">SYSTEM</div><button class="nav-item" data-page="settings"><span class="nav-icon">⚙</span>Settings</button></nav>
+      <div class="sidebar-bottom"><div class="user-card"><div class="avatar">MA</div><div><b>Marina Alves</b><span>Administrator</span></div><button class="more-btn">•••</button></div><button class="logout-btn" id="logoutBtn">↪ <span>Sign out</span></button></div>
+    </aside>
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+    <main class="main-area">
+      <header class="topbar"><div class="topbar-left"><button class="icon-btn menu-btn" id="openSidebar">☰</button><div class="breadcrumb"><span>Mallverse</span><b>/</b><strong id="breadcrumbCurrent">Dashboard</strong></div></div><div class="topbar-actions"><div class="top-search"><span>⌕</span><input id="globalSearch" placeholder="Search anything..." /><kbd>⌘ K</kbd></div><button class="icon-btn notification-btn" id="notificationBtn" aria-label="Notificações">♧<i></i></button><button class="icon-btn theme-btn" id="themeBtn" aria-label="Alternar tema">☼</button><div class="mini-avatar">MA</div></div></header>
+      <section class="content" id="app"></section>
+    </main>
+  </div>
+  <div class="toast-region" id="toastRegion"></div>
+  <div class="modal-backdrop" id="modalBackdrop"><div class="modal" id="modal"></div></div>
+  <div class="notification-panel" id="notificationPanel"><div class="panel-head"><div><span class="eyebrow">INBOX</span><h3>Notifications</h3></div><button class="icon-btn" id="closeNotifications">×</button></div><div class="notification unread"><span class="notif-icon teal">▤</span><div><b>Contract expiring soon</b><p>Contrato da Aurora Fashion vence em 18 dias.</p><small>8 min ago</small></div></div><div class="notification"><span class="notif-icon purple">☆</span><div><b>New review received</b><p>Camila Rodrigues avaliou o Mall Central.</p><small>42 min ago</small></div></div><div class="notification"><span class="notif-icon amber">⌖</span><div><b>Parking capacity updated</b><p>Setor B atualizado por Rafael Lima.</p><small>2 hours ago</small></div></div></div>
+  <script src="js/app.js"></script>
+</body>
+</html>
