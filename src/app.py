@@ -18,7 +18,9 @@ app = FastAPI(
 )
 
 origins = [
-    "http://127.0.0.1:5500"
+    "http://127.0.0.1:5500",
+    "http://localhost:4200",
+    "http://127.0.0.1:4200",
 ]
 
 app.add_middleware(
@@ -29,13 +31,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(shoppings_controllers.router)
-app.include_router(clientes_controllers.router)
-app.include_router(avaliacoes_controllers.router)
-app.include_router(contratos_controllers.router)
-app.include_router(lojas_controllers.router)
-app.include_router(funcionarios_controllers.router)
-app.include_router(estacionamento_controllers.router)
+# Mantém todos os recursos sob o contrato público consumido pelo frontend.
+app.include_router(shoppings_controllers.router, prefix="/api")
+app.include_router(clientes_controllers.router, prefix="/api")
+app.include_router(avaliacoes_controllers.router, prefix="/api")
+app.include_router(contratos_controllers.router, prefix="/api")
+app.include_router(lojas_controllers.router, prefix="/api")
+app.include_router(funcionarios_controllers.router, prefix="/api")
+app.include_router(estacionamento_controllers.router, prefix="/api")
 
 
 
