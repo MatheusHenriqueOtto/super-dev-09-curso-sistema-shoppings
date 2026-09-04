@@ -1,0 +1,12 @@
+:root {
+  --font-sans: "Manrope", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --bg-canvas: #08101d; --bg-sidebar: #0b1525;
+  --bg-card: #111d31; --bg-elevated: #15243b; --bg-table: #0e192b; --bg-surface: var(--bg-elevated); --bg-hover: #1a2b46;
+  --border-subtle: rgba(148, 163, 184, .15); --border-strong: rgba(148, 163, 184, .29);
+  --text-primary: #f1f5f9; --text-secondary: #b2bfd2; --text-muted: #7f91ab;
+  --primary: #f5b942; --primary-hover: #ffd16b; --primary-ink: #231a08;
+  --success: #3ed69a; --success-bg: rgba(36, 158, 111, .16); --danger: #fb8891; --danger-bg: rgba(225, 82, 96, .16); --info: #83b6ff;
+  --radius-sm: 8px; --radius-md: 14px; --radius-lg: 20px;
+  --shadow-card: 0 12px 28px rgba(0, 0, 0, .16); --shadow-float: 0 24px 70px rgba(0, 0, 0, .48);
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 20px; --space-6: 24px; --space-8: 32px; --space-10: 40px;
+}
